@@ -21,7 +21,12 @@ Add the following to your configuration file (located at `%APPDATA%\Claude\claud
 {
   "mcpServers": {
     "mst-mcp": {
-      "url": "https://glama.ai/mcp/gateway/vipulsutar11/mst-mcp"
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-proxy",
+        "https://glama.ai/mcp/gateway/vipulsutar11/mst-mcp"
+      ]
     }
   }
 }
