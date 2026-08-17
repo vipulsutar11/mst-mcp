@@ -1,0 +1,117 @@
+Here is the structured data extracted from the page, [Accounts on MST Chain | Developer Docs | MST Blockchain](https://docs.mstblockchain.com/developer-docs/foundation/accounts-on-mst-chain):
+
+---
+
+# Accounts on MST Chain
+
+An MST Blockchain account is an entity with an MSTC (MST Coin) balance that can initiate transactions or receive assets. Accounts can be controlled by private keys (user-owned) or governed entirely by code (smart contracts).
+
+## Prerequisites
+
+Before diving into account types, it’s helpful to review the [introduction to MST Blockchain](https://docs.mstblockchain.com/developer-docs/foundation/introduction-of-mst-chain) to understand how the protocol handles transactions, balances, and execution.
+
+---
+
+## Account Types
+
+MST Blockchain supports two account types:
+
+1. **Externally-Owned Account (EOA):** Controlled by an individual or application holding the private keys.
+2. **Contract Account:** A smart contract deployed to the network, governed by its embedded code rather than a private key.
+
+**Both account types can:**
+
+* Receive, store, and send MSTC or other assets
+* Interact with deployed smart contracts and dApps
+
+---
+
+## Key Differences
+
+### Externally-Owned Account (EOA)
+
+* Creation is free (only requires generating a key pair).
+* Can initiate transactions directly.
+* Transactions between EOAs are limited to asset transfers (MSTC or tokens).
+* Composed of a cryptographic key pair (public key + private key) controlling account access.
+
+### Contract Account
+
+* Creation requires MSTC to cover network storage costs.
+* Cannot initiate transactions independently; it only responds to incoming transactions.
+* Transactions from EOAs to contracts can trigger arbitrary code execution (e.g., token transfers, governance actions, deploying other contracts).
+* Has no private keys; fully governed by the logic in its smart contract code.
+
+---
+
+## Internal Structure of an MST Account
+
+Each MST Blockchain account has four key fields:
+
+1. **nonce:** A counter that tracks the number of transactions sent (for EOAs) or the number of contracts created (for contract accounts). It ensures each transaction is unique, preventing replay attacks.
+2. **balance:** The amount of MSTC held by the account, measured in the smallest unit ($1\text{ MSTC} = 10^{18}\text{ subunits}$).
+3. **codeHash:** The hash of the account’s EVM-compatible bytecode. For contract accounts, this points to executable code stored in the state database. For EOAs, it is the hash of an empty string.
+4. **storageRoot:** The root hash of the Merkle Patricia Trie storing the contract’s persistent variables. For EOAs, this is empty.
+
+---
+
+## EOAs and Key Pairs
+
+An EOA consists of a public and private key pair, ensuring that only the rightful owner can authorise transactions.
+
+* **Private Key:** A 256-bit number (64 hexadecimal characters) that must be kept secret.
+* **Public Key:** Derived from the private key using elliptic curve cryptography (specifically `secp256k1`).
+* **Address:** The last 20 bytes of the Keccak-256 hash of the public key, prefixed with `0x`, forming a 42-character identifier.
+
+> **Example Address:**
+> `0x5e97870f263700f46aa00d967821199b9bc5a120`
+
+> *Important:* You never “hold” MSTC itself; you hold private keys that grant you the ability to move MSTC recorded on the blockchain ledger.
+
+---
+
+## Account Creation
+
+When creating an account, most MST-compatible libraries or wallets generate a random private key. The key can be stored in an encrypted keystore file protected by a password.
+
+*Example private key (hexadecimal, shortened for clarity):*
+
+`fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036415f`
+
+**From this private key:**
+
+* A public key is derived using elliptic curve operations.
+* An account address is generated from the Keccak-256 hash of the public key.
+
+---
+
+## Contract Accounts
+
+Contract accounts also have 42-character hexadecimal addresses. Their address is deterministically derived from:
+
+* The creator’s address
+* The creator’s nonce at deployment time
+
+> **Example:**
+> `0x06012c8cf97bead5deae237070f9587f8e7a266d`
+
+Once deployed, a contract’s bytecode cannot be altered, but its state variables can be updated according to the logic written in its code.
+
+---
+
+## Validator Keys
+
+In MST Blockchain’s Proof-of-Stake consensus (based on the Parlia mechanism), validator identities are secured using **ECDSA secp256k1** keys — the same cryptographic standard used for all externally owned accounts (EOAs) in Ethereum-compatible networks. These keys digitally sign consensus messages, enabling validators to participate in block production and finalisation.
+
+Validator keys are **distinct from regular account keys** used for holding MSTC balances. While an EOA is required for staking and rewards management, the validator’s operational key is dedicated to consensus duties, ensuring that control over funds remains separate from the infrastructure responsible for securing the network.
+
+---
+
+## Wallets vs Accounts
+
+An **account** is a data structure representing a public/private key pair or contract code on the MST Blockchain.
+
+A **wallet** is an interface (application, extension, or hardware device) that helps users interact with their accounts:
+
+* Wallets store and protect your private keys.
+* They enable you to sign transactions, manage assets, and interact with dApps.

@@ -1,0 +1,88 @@
+# Development Networks - MST Testnet
+
+The **MST Testnet** is a dedicated environment for developers to build, test, and experiment with applications before deploying them to the **MST Mainnet**. It operates under the same protocol rules, consensus mechanism, and transaction logic as the Mainnet, but uses **free MSTC test coins** instead of real assets.
+
+This allows developers to safely test their applications without financial risk.
+
+***
+
+### Prerequisites
+
+Before using the MST Testnet, it is recommended that you review:
+
+* [Accounts](/developer-docs/foundation/accounts-on-mst-chain.md) – to understand externally-owned accounts (EOAs) and contract accounts.
+* [Transactions ](/developer-docs/foundation/transactions.md)– to learn how actions are initiated and executed on MST Blockchain.
+* [Gas ](/developer-docs/foundation/gas.md)– to understand gas fees, limits, and execution costs.
+* [Network & Validator Structure](/developer-docs/foundation/network-and-validator-structure.md) – A high-level understanding between Mainnet & Testnet
+
+### Why Use the Testnet?
+
+The MST Testnet is designed to provide a realistic environment for:
+
+* **Smart Contract Testing** – Deploy, debug, and upgrade contracts without risking mainnet funds.
+* **Transaction Simulation** – Try out transfers, approvals, swaps, and contract interactions.
+* **DApp Development** – Build and iterate quickly before going live.
+* **Validator & Infrastructure Testing** – Run nodes, test API endpoints, and validate setups.
+* **Learning & Experimentation** – A safe playground for developers new to MST Blockchain.
+
+***
+
+### How the Testnet Works
+
+* The Testnet **follows the same rules as Mainnet**.
+* Gas fees, block production, and validator mechanics work identically.
+* The only difference: **Testnet MSTC has no real-world value**.
+
+Just like Mainnet, every action requires **gas fees**, but these are paid using **free Testnet MSTC**.
+
+***
+
+### Obtaining Testnet MSTC
+
+To interact with the MST Testnet, you’ll need **test MSTC coins**:
+
+1. **MST Faucet**
+   * Request free MSTC from the [MST Faucet](https://faucet.mstblockchain.com/).
+   * A fixed amount is distributed per request to prevent abuse.
+2. **No Economic Value**
+   * Testnet MSTC cannot be traded or used outside the Testnet.
+   * They exist solely for testing transactions and smart contracts.
+
+***
+
+### Connecting to the MST Testnet
+
+To connect:
+
+1. Open your MST-compatible wallet (e.g., MST Wallet, MetaMask with custom RPC).
+2. Add or switch to the **MST Testnet**.
+3. Request free MSTC from the faucet.
+4. Start deploying contracts, testing DApps, or running transactions.
+
+Example RPC details:
+
+```
+Network Name: MST Testnet
+RPC URL: https://testnetrpc.mstblockchain.com
+Chain ID: 91562037
+Currency Symbol: tMSTC
+Block Explorer: https://testnet.mstscan.com
+```
+
+***
+
+### Best Practices
+
+* **Thoroughly test before Mainnet** – Catch bugs early in Testnet.
+* **Simulate real-world conditions** – Use realistic gas fees, transaction sizes, and contract logic.
+* **Stay updated** – Testnet parameters may reset or upgrade more frequently than Mainnet.
+* **Avoid confusion** – Always double-check that you are on Testnet when handling free MSTC.
+
+***
+
+### Key Takeaways
+
+* The MST Testnet mirrors **Mainnet functionality**, but with **free test coins**.
+* It is a **safe playground** for development, testing, and experimentation.
+* All apps, DApps, and smart contracts should be tested here before deployment to Mainnet.
+* Testnet MSTC has **no economic value** and is only meant for testing.

@@ -1,0 +1,218 @@
+# Solidity : Smart Contract Programming Language
+
+### Introduction
+
+Solidity is the most widely used programming language for writing smart contracts on blockchains that are compatible with the **Ethereum Virtual Machine (EVM)**. Since MST Blockchain is fully EVM-compatible, everything you learn in Solidity applies directly here.
+
+If you’ve worked with **JavaScript, Python, or Java**, you’ll find Solidity familiar but with some blockchain-specific features. Once a smart contract is deployed, it becomes immutable (cannot be changed), making correctness and security very important.
+
+***
+
+### Prerequisites
+
+Before diving into Solidity, you should understand:
+
+* [**Accounts** ](/developer-docs/foundation/accounts-on-mst-chain.md)→ Accounts on MST (EOAs vs. Contract accounts)
+* [**Transactions** ](/developer-docs/foundation/transactions.md)→ Transactions on MST
+* [**EVM Basics**](/developer-docs/foundation/introduction-of-evm-and-opcodes.md) → How code executes on MST Chain
+
+***
+
+### Solidity Basics
+
+#### 1. Smart Contract Structure
+
+Every Solidity contract has three main parts:
+
+1. **State Variables** → store data on-chain permanently
+2. **Functions** → define logic to read/write data
+3. **Events** → notify off-chain applications
+
+***
+
+#### 2. First Example: Hello MST
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HelloMST {
+    string public message = "Hello, MST Blockchain!";
+
+    // Read function (free to call)
+    function getMessage() public view returns (string memory) {
+        return message;
+    }
+
+    // Write function (costs gas)
+    function setMessage(string calldata newMessage) public {
+        message = newMessage;
+    }
+}
+```
+
+**Key Points**
+
+* `pragma solidity ^0.8.0;` → tells compiler version
+* `public` → variable is auto-readable without extra code
+* `view` → function does not cost gas (read-only)
+* Writing functions (like `setMessage`) cost gas
+
+***
+
+#### 3. Data Types
+
+* **uint / int** → whole numbers (`uint256` most common)
+* **bool** → true/false
+* **address** → represents wallets & contracts
+* **string / bytes** → text or raw binary data
+* **mapping** → key-value store (like hashmaps)
+
+Example:
+
+```solidity
+uint256 public count = 0;
+bool public isActive = true;
+address public owner;
+mapping(address => uint256) public balances;
+```
+
+***
+
+#### 4. Functions
+
+Functions are the heart of Solidity contracts.
+
+* **view** → reads blockchain state
+* **pure** → does not read/write state (math only)
+* **payable** → accepts MSTC (native coin)
+
+Example:
+
+```solidity
+function add(uint256 a, uint256 b) public pure returns (uint256) {
+    return a + b;
+}
+
+function deposit() public payable {
+    balances[msg.sender] += msg.value;
+}
+```
+
+***
+
+#### 5. Control Structures
+
+Solidity supports `if`, `else`, `for`, `while`, and `require`.
+
+Example:
+
+```solidity
+function withdraw(uint amount) public {
+    require(balances[msg.sender] >= amount, "Not enough balance");
+    balances[msg.sender] -= amount;
+    payable(msg.sender).transfer(amount);
+}
+```
+
+***
+
+### Building a Simple Token
+
+Let’s build a **basic token** contract that runs on MST Blockchain:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract MSTCoin {
+    string public name = "MSTCoin";
+    string public symbol = "MSTC";
+    uint8 public decimals = 18;
+    uint256 public totalSupply;
+
+    mapping(address => uint256) public balanceOf;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    constructor(uint256 _supply) {
+        totalSupply = _supply * 10**uint256(decimals);
+        balanceOf[msg.sender] = totalSupply; // assign all tokens to deployer
+    }
+
+    function transfer(address _to, uint256 _value) public returns (bool) {
+        require(balanceOf[msg.sender] >= _value, "Not enough balance");
+        balanceOf[msg.sender] -= _value;
+        balanceOf[_to] += _value;
+        emit Transfer(msg.sender, _to, _value);
+        return true;
+    }
+}
+```
+
+✅ Now you’ve created your own token on MST Chain.
+
+***
+
+### Deploying on MST Blockchain (Step-by-Step)
+
+#### Option 1: Using Remix IDE (Beginner-Friendly)
+
+1. Go to Remix IDE
+2. Create a new file `MSTCoin.sol` and paste the contract
+3. Compile with `0.8.x` compiler
+4. Switch MetaMask network to **MST Testnet** (RPC + Chain ID)
+5. In Remix, select **Injected Web3** and connect MetaMask
+6. Deploy contract → approve transaction in MetaMask
+7. Copy contract address → you can now interact with it
+
+***
+
+#### Option 2: Using Hardhat (For Developers)
+
+1. Install Hardhat
+
+   ```bash
+   npm install --save-dev hardhat
+   ```
+2. Create a project
+
+   ```bash
+   npx hardhat init
+   ```
+3. Add MST RPC to `hardhat.config.js`
+
+   ```js
+   networks: {
+     mst: {
+       url: "https://rpc-testnet.mstchain.io",
+       accounts: [PRIVATE_KEY]
+     }
+   }
+   ```
+4. Write your contract in `contracts/` folder
+5. Compile & deploy
+
+   ```bash
+   npx hardhat compile
+   npx hardhat run scripts/deploy.js --network mst
+   ```
+
+***
+
+### Best Practices
+
+* Always use the **latest stable compiler** (`^0.8.x`)
+* Use `require()` for input validation
+* Emit **events** for important actions
+* Avoid unnecessary storage writes (to save gas)
+* Audit contracts before mainnet deployment
+
+### References & Learning Resources
+
+* [Official Solidity Docs](https://docs.soliditylang.org/)
+* [Remix IDE](https://remix.ethereum.org/)
+* [Hardhat Docs](https://hardhat.org/)
+* [Truffle Suite](https://trufflesuite.com/)
+* [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/) → prebuilt, audited smart contracts
+* [Ethereum Smart Contract Best Practices](https://consensys.github.io/smart-contract-best-practices/)

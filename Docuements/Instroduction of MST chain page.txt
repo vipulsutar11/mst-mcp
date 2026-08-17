@@ -1,0 +1,50 @@
+Here is the structured data extracted from the current page, [Introduction of MST Chain | Developer Docs | MST Blockchain](https://docs.mstblockchain.com/developer-docs/foundation/introduction-of-mst-chain):
+
+---
+
+# Introduction of MST Chain
+
+## What is Blockchain?
+
+A **blockchain** is like a shared public record book that is stored, updated, and synchronized across many computers connected to the same network. Instead of being kept in one place, copies of this record exist on multiple machines, making it open, transparent, and very hard to tamper with.
+
+* **Blocks:** These are groups of data stored in order, one after another. For example, if you send MSTC (the native coin of MST Chain) to someone, the transaction details are packed into a block.
+* **Chain:** Each block is securely linked to the one before it using cryptography. This creates a chain of blocks. Changing one block would require changing all the blocks that follow — which is nearly impossible without the agreement of the whole network.
+
+Every participant in the network must agree on what the latest block is and what the full chain looks like. These participants are called **nodes**. Nodes keep everyone in sync and make sure the data is the same for everyone. This agreement process is managed through a **consensus mechanism**.
+
+---
+
+## MST Blockchain Mechanism
+
+MST Chain uses the **Parlia consensus mechanism** where:
+
+* Validators take turns creating and verifying new blocks.
+* To become a validator, a participant must meet MST Chain’s requirements and run the validator node software.
+* Honest and active validators earn rewards, while bad behaviour can lead to penalties or removal.
+
+The community runs the network not only to support decentralisation and security but also because they are rewarded for their contribution. In return for honest and consistent participation, validators earn MSTC rewards. These incentives keep the network reliable, efficient, and community-driven.
+
+---
+
+## MSTC – The Native Coin
+
+MSTC is the lifeblood of MST Chain, acting as both the fuel for transactions and the incentive for those who maintain the network. Every action on the blockchain — from sending coins to interacting with a smart contract — requires a small amount of MSTC to be paid as a transaction fee. Validators are rewarded in MSTC for their work in securing the network and processing transactions. Beyond technical functions, MSTC also plays a role in governance, allowing holders to participate in decisions that shape the future of the chain.
+
+---
+
+## DAO on MST Chain
+
+A **DAO** (Decentralised Autonomous Organisation) is a community-led governance system where decisions are made collectively, without relying on a central authority. On MST Chain, the DAO gives MSTC holders the ability to influence the direction of the network, propose changes, and vote on key upgrades or ecosystem initiatives. All decisions are recorded on the blockchain, ensuring complete transparency and verifiable outcomes.
+
+In the MST Chain DAO, voting power is linked to the amount of MSTC a participant holds or stakes, aligning influence with commitment to the network. Proposals can range from technical protocol changes to funding ecosystem projects, and once approved by the community, they are implemented according to predefined smart contract rules.
+
+The DAO structure complements MST Chain’s validator-driven network by placing long-term governance in the hands of the community. Validators secure the blockchain daily, while the DAO shapes the network’s strategic direction. Together, they create a self-sustaining and democratically managed ecosystem where all stakeholders have a voice.
+
+---
+
+## EVM on MST Chain
+
+MST Chain is fully EVM-compatible, meaning it can run the same smart contracts and decentralized applications (dApps) that work on Ethereum without requiring major changes. This compatibility gives developers the freedom to migrate existing Ethereum-based projects to MST Chain quickly, while taking advantage of lower transaction fees and faster confirmation times.
+
+EVM compatibility also allows developers to use familiar tools such as MetaMask, Remix, Truffle, and Hardhat, reducing the learning curve and speeding up development. It opens the door to interoperability with the wider Ethereum ecosystem through cross-chain bridges, enabling the transfer of assets and data between MST Chain and other EVM-based networks. This makes MST Chain an attractive choice for developers who want Ethereum’s flexibility but with better scalability and cost efficiency.

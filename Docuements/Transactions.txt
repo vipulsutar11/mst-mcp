@@ -1,0 +1,133 @@
+Here is the complete extracted content from the [Transactions Developer Documentation](https://docs.mstblockchain.com/developer-docs/foundation/transactions):
+
+---
+
+# Transactions
+
+A **transaction** is a digitally signed, atomic message initiated by an **Externally-Owned Account (EOA)** — an account controlled by a human via a private key, not by smart contract code.
+
+> **Analogy:** Think of an MST transaction as a signed order slip submitted to the blockchain network, requesting a state change (e.g., moving MSTC, deploying contracts, or executing code).
+
+### Example
+
+If Alice sends Bob **10 MSTC**:
+
+* **Alice’s balance** $\rightarrow$ decreases by 10 MSTC plus applicable transaction fees.
+* **Bob’s balance** $\rightarrow$ increases by 10 MSTC.
+* This state change is **permanently recorded** on-chain once included in a block.
+
+---
+
+## Prerequisites
+
+Before diving into this section, you should be familiar with:
+
+* **Accounts** – Understanding the difference between Externally-Owned Accounts (EOAs) and Contract Accounts.
+* **Introduction to MST Blockchain** – A high-level overview of network architecture, consensus, and core components.
+
+---
+
+## Transaction Validity Rules
+
+Any transaction that changes blockchain state must:
+
+1. **Be signed** using the sender’s private key with **ECDSA** over the **secp256k1** curve.
+* *Reference:* EIP-155 (Replay protection), BIP-62 (Canonical Signatures).
+
+
+2. **Be broadcast** to the peer-to-peer network for inclusion in the **mempool**.
+3. **Be validated and added** to a block by a **consensus validator**.
+
+---
+
+## Transaction Structure
+
+An MST transaction conforms to Ethereum’s **Legacy Transaction** model (EIP-2718 type `0x0`) and omits EIP-1559 fields, using a **single gas price model**.
+
+| Field | Description | Standards Reference |
+| --- | --- | --- |
+| `from` | Sender’s EOA address. | EIP-55 (Checksummed Address) |
+| `to` | Recipient’s address (EOA or Contract). Empty when deploying contracts. | EIP-1014 (CREATE2 address derivation) |
+| `gasPrice` | Fee per unit of gas, in Wei. | Legacy model (Yellow Paper §6.2.1) |
+| `gasLimit` / `gas` | Max gas units allowed for transaction execution. | Ethereum Yellow Paper |
+| `nonce` | Number of transactions sent from this address (prevents replay). | EIP-155 |
+| `value` | Amount of MSTC to transfer (in Wei). | Ethereum Standard |
+| `data` | Optional field for contract bytecode or ABI-encoded function calls. | EIP-20, EIP-721, EIP-1155 |
+| `v, r, s` | Signature components generated from ECDSA signing. | BIP-66 (DER signatures) |
+
+---
+
+## Gas
+
+Gas represents the **computational effort** required to process a transaction.
+
+* **Fee Calculation:**
+
+$$\text{fee} = \text{gasUsed} \times \text{gasPrice}$$
+
+
+* Validators receive the **full gas fee**.
+* Any unused gas is refunded to the sender (EIP-150 gas reduction rules apply).
+
+---
+
+## Example Transaction Object
+
+```json
+{
+  "from": "0x92a8f3d4a5b8c1d05d1fa35b6c1d6f8af8f7c88a",
+  "to": "0x07a565b7ed7d7a678680a4c162885bedbb695fe0",
+  "gasPrice": "20000000000",
+  "gas": "21000",
+  "nonce": "0",
+  "value": "1000000000000000000",
+  "data": "0x",
+  "v": "0x25",
+  "r": "0x5f6e...",
+  "s": "0xa91c..."
+}
+
+```
+
+---
+
+## Transaction Types in MST
+
+MST Blockchain supports three primary transaction types:
+
+1. **Standard Transfers:** Transferring MSTC from one EOA to another.
+2. **Contract Deployments:** `to` field is empty; `data` contains the compiled bytecode.
+3. **Contract Interactions:** `to` contains the contract address; `data` contains the encoded function selector and parameters.
+
+> **Note:** Unlike Ethereum post-London Upgrade (EIP-1559), MST uses **only the legacy `gasPrice` model** (no base fee or priority tip).
+
+---
+
+## Smart Contract Interactions
+
+* **Function Selector:** The first 4 bytes of `data` correspond to the Keccak-256 hash of the function signature.
+* **Parameters:** ABI-encoded following the standard Ethereum Contract ABI specification.
+* **Unused Gas:** Refunded according to EIP-150 rules.
+
+---
+
+## Transaction Lifecycle
+
+1. **Creation & Signing:** The sender's wallet constructs transaction fields, hashes them with Keccak-256, and signs with ECDSA (`secp256k1`).
+2. **Broadcast to Mempool:** The transaction is propagated across peers via MST’s P2P gossip protocol.
+3. **Inclusion in Block:** Validators select transactions from the mempool, order them, and execute state transitions.
+4. **Finalization:** Once consensus is reached and sufficient confirmations occur, the transaction is finalized.
+
+---
+
+## Relevant Standards & References
+
+* **Ethereum Yellow Paper:** Core transaction execution model.
+* **EIP-55:** Checksummed addresses.
+* **EIP-150:** Gas cost changes & refund rules.
+* **EIP-155:** Replay attack protection.
+* **EIP-1014:** Skinny `CREATE2` address generation.
+* **EIP-20, EIP-721, EIP-1155:** Token and NFT interaction standards.
+* **EIP-2718:** Typed transaction envelopes (legacy type used).
+* **BIP-32, BIP-39, BIP-44:** Hierarchical Deterministic (HD) wallet derivation.
+* **BIP-66:** Strict DER signature enforcement principles.

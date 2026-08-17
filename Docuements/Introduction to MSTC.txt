@@ -1,0 +1,64 @@
+Here is the structured data extracted from the page, [Introduction of MSTC | Developer Docs | MST Blockchain](https://docs.mstblockchain.com/developer-docs/foundation/introduction-of-mstc):
+
+---
+
+# Introduction of MSTC
+
+**MSTC** is the native coin that powers the MST Chain ecosystem. It serves as the fuel for every transaction and interaction that happens on the blockchain. Whenever you send funds, interact with a smart contract, deploy a dApp, or participate in governance, MSTC is required to process and record those actions on the chain. Just like ETH on Ethereum, MSTC is essential for keeping the network secure, functional, and decentralised.
+
+---
+
+## Why MSTC Exists
+
+MSTC plays multiple roles within the MST Chain:
+
+* **Transaction Fees:** Every on-chain action requires a small MSTC fee to compensate validators for their work in verifying and adding transactions to blocks.
+* **Validator Rewards:** Validators earn MSTC as incentives for keeping the network secure and processing transactions honestly.
+* **Governance Power:** MSTC holders can participate in the MST Chain DAO, proposing and voting on important upgrades or ecosystem decisions.
+* **Utility Payments:** MSTC can be used within decentralized applications, NFT marketplaces, DeFi platforms, and other services built on MST Chain.
+* **Value Exchange:** MSTC can be traded, stored, or reinvested in validator operations.
+
+---
+
+## MSTC Units – Wei, Gwei, and Beyond
+
+To make transactions precise, MSTC is divisible into smaller units — just like a rupee breaks down into paise or a dollar into cents. The smallest unit is called **Wei**, representing $0.000000000000000001$ MSTC ($1$ quintillionth of an MSTC). Larger units, like **Gwei**, are commonly used to measure transaction fees.
+
+| Unit | Value in MSTC | Common Usage |
+| --- | --- | --- |
+| **Wei** | 0.000000000000000001 MSTC | Smallest unit used internally in computations |
+| **Kwei** | 0.000000000000001 MSTC | Rarely used |
+| **Mwei** | 0.000000001 MSTC | Rarely used |
+| **Gwei** | 0.000000001 MSTC | Commonly used for gas (transaction) fees |
+| **Micro** | 0.000001 MSTC | Sometimes used for micropayments |
+| **Milli** | 0.001 MSTC | Small transactions |
+| **MSTC** | 1 MSTC | Standard unit |
+| **KiloMSTC** | 1,000 MSTC | Large amounts |
+| **MegaMSTC** | 1,000,000 MSTC | Very large holdings |
+
+> *Example:* When you see a transaction fee of “20 Gwei,” it means **0.000000020 MSTC** is charged for each unit of gas consumed by the transaction.
+
+---
+
+## Gas Fees and MSTC
+
+Gas is the cost required to perform operations on MST Chain, such as sending MSTC or interacting with smart contracts. This gas is paid in MSTC, and its price is usually expressed in Gwei. Gas fees incentivize validators to process transactions, prevent network spam, and ensure resources are used efficiently.
+
+---
+
+## Circulation and Supply
+
+MSTC is the official currency of the MST Blockchain, used for transaction fees, validator rewards, governance, and network utility.
+
+* **Initial Mint:** At launch, **50 billion MSTC** were minted to support ecosystem growth.
+* **Burn Event:** On December 31, 2024, a major burn event reduced the circulating supply to **8,401,387,498 MSTC**, reinforcing scarcity and long-term stability.
+* **Validator Rewards:** Validators currently receive **200 MSTC per block**, with rewards halving every two years ($200 \rightarrow 100 \rightarrow 50$, etc.), creating a disinflationary supply curve similar to Bitcoin.
+
+---
+
+## MSTC in the Ecosystem
+
+Beyond fees and rewards, MSTC acts as a bridge between users, developers, and the network itself:
+
+* **For Developers:** dApp creators can integrate MSTC for in-app purchases, NFT minting, or DeFi lending and borrowing.
+* **For Users:** Users can hold MSTC for staking, governance participation, or as a tradable digital asset.

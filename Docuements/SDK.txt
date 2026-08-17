@@ -1,0 +1,43 @@
+# SDK
+
+### Modules  **Client**&#x20;
+
+The root container and main entry point.
+
+1. static createRandom(rpcUrl): \
+   Returns a new Client instance with a random signer.
+2. &#x20;provider: Instance of Provider.
+3. signer: Instance of Signer (if privateKey provided).
+
+### **Provider (Read-only)**
+
+Accessed via client. provider.
+
+* getBlockNumber(): Returns the latest block.
+* getBalance(address): Fetches raw balance.
+* getTransactionReceipt(hash): Fetches the receipt of a mined txn.
+* waitForTransaction(hash): Waits for a txn to be mined.
+* estimateGas(txObject): Estimates gas for a raw transaction object.
+
+### **Signer (Identity & Writing)**
+
+Accessed via client signer.
+
+* static createRandom(provider): Generates a new random Signer attached to a provider.
+* getPrivateKey(): Returns the private key of the current wallet.\
+  estimateGas(method, args): Estimates gas for Signer methods (sendNative, sendToken, deploy).
+* sendTransaction(tx): Signs and broadcasts any transaction.
+* sendNative(to, amount): Shortcut for sending native tokens.
+* sendToken(tokenAddress, to, amount): Sends ERC20 tokens.
+* deploy(abi, bytecode, args?): Deploys smart contracts.
+* getAddress(): Returns the signer's public address.<br>
+
+### **Errors:**&#x20;
+
+Custom error classes for better debugging.
+
+* ProviderError: Network or RPC issues.
+* TransactionError: Validation or on-chain submission failures.
+* WalletError: Private key or signer initialisation issues.<br>
+
+For more details, installation instructions, and updates, you can check out the official package page on npm:[ @mstblockchain/mst-sdk.](https://www.npmjs.com/package/@mstblockchain/mst-sdk)

@@ -1,0 +1,85 @@
+# Blocks
+
+### **Blocks**
+
+Blocks are batches of transactions that include a hash of the previous block in the chain. This cryptographic linking of blocks ensures that any modification to historical data changes all subsequent block hashes, making tampering immediately detectable by all nodes in the network.
+
+In MST Blockchain, this chain of blocks forms the complete, verifiable transaction history of the network. Each block not only stores executed transactions but also records essential consensus and network metadata.
+
+***
+
+### **Prerequisites**
+
+Blocks are a beginner-friendly concept, but to fully understand this page, it’s best to first read about [**Accounts**](/developer-docs/foundation/accounts-on-mst-chain.md), [**Transactions**](/developer-docs/foundation/transactions.md), and our [**Introduction to MST Blockchain**](/developer-docs/foundation/introduction-of-mst-chain.md).
+
+***
+
+### **Why blocks?**
+
+To keep all participants synchronised and in agreement about the exact transaction history, MST Blockchain batches transactions into blocks. Instead of committing each transaction individually, dozens (or hundreds) are confirmed together, ensuring efficient state updates and consensus.
+
+By spacing out block production, validators have time to verify, agree on, and propagate state changes across the entire network. In MST Blockchain, blocks are produced approximately every **3 seconds** under the **Proof-of-Staked-Authority (PoSA)** consensus.
+
+***
+
+### **How blocks work**
+
+Blocks are strictly ordered: every new block contains a reference to its parent block, and transactions inside each block are ordered as well. Under normal operation, all network nodes agree on the exact height and history of blocks.
+
+In each block cycle, an active validator from the current validator set is selected (in a round-robin fashion) to propose the next block. The validator executes the pending transactions, updates the state, and broadcasts the new block to peers.
+
+Other validators verify the block’s transactions, state root, and signatures. If valid, they add it to their local chain and prepare for the next round.
+
+***
+
+### **Proof-of-Staked-Authority (PoSA) protocol**
+
+PoSA combines aspects of delegated Proof-of-Stake and Proof-of-Authority:
+
+* **Validator selection** – MST Blockchain maintains a fixed active validator set (e.g., 21 validators), selected from a larger pool based on staked MSTC and governance voting.
+* **Block proposal** – In each block round (\~3s), one validator is assigned as proposer in a deterministic sequence.
+* **Block validation** – The remaining validators check the block’s validity and propagate it further.
+* **Slashing & penalties** – Validators who double-sign or go offline can be penalized by losing reputation, stake, or future selection opportunities.
+
+This design provides short block times and finality while keeping the validator set manageable for fast consensus.
+
+***
+
+### **What's in a block?**
+
+A block in MST Blockchain contains the following top-level fields:
+
+| Field              | Description                                                         |
+| ------------------ | ------------------------------------------------------------------- |
+| `parentHash`       | Hash of the preceding block                                         |
+| `sha3Uncles`       | Keccak-256 hash of the list of uncle blocks                         |
+| `miner`            | Address of the block proposer (validator)                           |
+| `stateRoot`        | Root hash of the state trie after applying the block’s transactions |
+| `transactionsRoot` | Root hash of the transactions trie                                  |
+| `receiptsRoot`     | Root hash of the transaction receipts trie                          |
+| `logsBloom`        | Bloom filter for quickly searching logs                             |
+| `difficulty`       | Fixed difficulty value (not used in PoSA)                           |
+| `number`           | The block number (height)                                           |
+| `gasLimit`         | Maximum gas allowed in the block                                    |
+| `gasUsed`          | Total gas used by included transactions                             |
+| `timestamp`        | Block creation time                                                 |
+| `extraData`        | Optional arbitrary data                                             |
+| `mixHash`          | Fixed value in PoSA (no mining)                                     |
+| `nonce`            | Fixed value in PoSA                                                 |
+| `transactions`     | List of transaction objects                                         |
+| `uncles`           | List of uncle blocks (rare in PoSA)                                 |
+
+***
+
+### **Block time**
+
+MST Blockchain’s target block time is **\~3 seconds**, thanks to PoSA’s deterministic validator rotation.\
+Unlike Proof-of-Work systems where block times are probabilistic, MST Blockchain produces blocks on a near-fixed schedule. Occasional delays can occur if a validator is offline, but the network quickly recovers as the next validator in line proposes a block.
+
+***
+
+### **Block size**
+
+Each block has a gas limit, determining how many transactions can be included. In MST Blockchain, the default gas limit is around **30 million gas**.
+
+The block gas limit can be adjusted slightly over time through validator consensus. This cap ensures that block processing stays within reasonable hardware requirements, keeping the network decentralised and accessible to a wider range of node operators.

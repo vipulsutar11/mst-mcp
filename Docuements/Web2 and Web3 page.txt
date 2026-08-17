@@ -1,0 +1,64 @@
+Here is the complete structured data extracted from the page [Web2 and Web3 | Developer Docs | MST Blockchain](https://docs.mstblockchain.com/developer-docs/foundation/web2-and-web3):
+
+---
+
+# Web2 and Web3
+
+**Web2** is the internet as we know it today — platforms and apps like social media, e-commerce, and online services. Most data is stored on central servers owned by companies. Users interact through web browsers and apps, but control of the platform stays with the provider.
+
+**Web3** is the next phase of the internet, powered by blockchain technology. It focuses on decentralisation, giving users ownership of their data, digital assets, and identities. Instead of relying on a single company, it uses peer-to-peer networks and smart contracts.
+
+---
+
+## Difference between Web2.0 & Web3.0
+
+| Feature | Web2 | Web3 |
+| --- | --- | --- |
+| **Control** | Controlled by companies | Controlled by users and communities |
+| **Data Storage** | Centralised Servers | Decentralised on blockchain |
+| **Payments** | Traditional banks, payment gateways | Cryptocurrencies, smart contracts |
+| **Security** | Company-managed | Blockchain-based, tamper-resistant |
+| **Identity** | Email/password accounts | Blockchain wallets & keys |
+
+---
+
+## Centralisation vs Decentralisation
+
+Web2.0 relies on **centralised systems** operating on a hub-and-spoke model — one central authority manages and controls everything. Web3.0 relies on **decentralised systems** operating like a web — no single point of control, and decisions are made collectively by the network.
+
+| Centralised Systems | Decentralised Systems |
+| --- | --- |
+| Information travels quickly because a single authority handles it with powerful resources. | Information may take longer to spread, as it passes through multiple participants. |
+| Higher performance and easier to build. | Lower performance and more complex to set up. |
+| Conflicts are easy to resolve — the central authority decides. | Requires special protocols to resolve disputes between participants. |
+| **Single point of failure** — if the central authority is attacked, the whole network can go down. | **No single point of failure** — the network keeps working even if many participants are attacked. |
+| Easy to coordinate updates and changes — the central authority can enforce them. | Harder to coordinate updates — disagreements can split the network. |
+| The central authority can censor or block participants. | Censorship is difficult because data can travel many paths. |
+| Participation is controlled by the central authority (gatekeeping). | Anyone can join — no gatekeepers, low barriers to entry. |
+
+> *Note: These points describe general trends, not absolute rules. Most networks exist on a spectrum depending on design, purpose, and governance.*
+
+---
+
+## Advantages of Web3
+
+* **User Ownership:** You control your data and assets.
+* **Transparency:** All transactions are visible on the blockchain.
+* **Security:** Tamper-proof and resistant to hacks.
+* **No Middlemen:** Direct interactions between users.
+* **Global Access:** Anyone with internet can participate.
+
+---
+
+## Limitations of Web3
+
+* Slower transaction speeds compared to Web2.
+* High network fees in some cases.
+* Requires technical knowledge to use.
+* Limited scalability for mass adoption.
+
+---
+
+## Overcoming Web3 Limitations with Web2 + Web3
+
+By combining Web2 and Web3, applications can keep the speed, scalability, and ease of Web2 while adding the ownership, transparency, and security of Web3. This hybrid model makes blockchain-powered applications faster, cheaper, and easier for everyone to use.
