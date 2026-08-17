@@ -1,5 +1,6 @@
 # pyrefly: ignore [missing-import]
 from mcp.server import MCPServer
+# pyrefly: ignore [missing-import]
 from mcp.types import Resource
 import os
 import sys
@@ -22,27 +23,6 @@ def get_doc_resource(filename: str) -> str:
         
     with open(filepath, "r", encoding="utf-8") as f:
         return f.read()
-
-
-@mcp.list_resources()
-def list_resources() -> list[Resource]:
-    """
-    Lists all documentation files as MCP resources.
-    """
-    if not os.path.exists(DOCS_DIR):
-        return []
-    resources = []
-    for filename in os.listdir(DOCS_DIR):
-        if os.path.isfile(os.path.join(DOCS_DIR, filename)):
-            resources.append(
-                Resource(
-                    uri=f"docs://{filename}",
-                    name=filename,
-                    mimeType="text/plain",
-                    description=f"Documentation about {os.path.splitext(filename)[0]}"
-                )
-            )
-    return resources
 
 
 @mcp.tool()
@@ -112,4 +92,4 @@ if __name__ == "__main__":
         print("It is designed to be run by an MCP client (such as Claude Desktop or Cursor).")
         print("==================================================")
     else:
-        mcp.run()
+        mcp.run()
