@@ -25,12 +25,15 @@ Add the following to your configuration file (located at `%APPDATA%\Claude\claud
       "args": [
         "-y",
         "mcp-proxy",
-        "https://glama.ai/mcp/gateway/vipulsutar11/mst-mcp"
+        "https://glama.ai/mcp/instances/YOUR_GLAMA_INSTANCE_ID/sse"
       ]
     }
   }
 }
 ```
+
+> [!IMPORTANT]
+> Make sure to replace `https://glama.ai/mcp/instances/YOUR_GLAMA_INSTANCE_ID/sse` with the actual unique URL generated in your [Glama settings page](https://glama.ai/settings/mcp/servers).
 
 ### Cursor Configuration
 1. Go to **Cursor Settings** > **Features** > **MCP**.
