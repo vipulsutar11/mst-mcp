@@ -220,6 +220,8 @@ if __name__ == "__main__":
         import uvicorn
         port = int(port_env)
         print(f"Starting SSE MCP server on port {port}...")
+        print(f"OAuth Client ID configured: {CLIENT_ID}")
+        print(f"OAuth Client Secret configured: {CLIENT_SECRET}")
         uvicorn.run("server:app", host="0.0.0.0", port=port)
     elif sys.stdin.isatty():
         print("==================================================")
