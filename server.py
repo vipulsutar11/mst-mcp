@@ -215,7 +215,9 @@ async def handle_sse(request):
         )
 
     if request.method == "POST":
-        return await sse.handle_post_message(request)
+        from starlette.responses import Response
+        await sse.handle_post_message(request.scope, request.receive, request._send)
+        return Response()
 
     async with sse.connect_sse(
         request.scope, request.receive, request._send
