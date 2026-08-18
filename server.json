@@ -1,22 +1,20 @@
 {
-  "name": "mst-mcp",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.vipulsutar11/mst-mcp",
   "displayName": "MST-MCP",
-  "description": "An MCP server designed for the MST Chain ecosystem that provides search and retrieval tools for documentation.",
-  "version": "1.0.0",
-  "repository": "https://github.com/vipulsutar11/mst-mcp",
-  "publisher": "vipulsutar11",
-  "runtime": "python",
-  "entrypoint": "server.py",
-  "startCommand": {
-    "command": "python",
-    "args": [
-      "server.py"
-    ]
+  "description": "MCP server for the MST Chain ecosystem providing search and retrieval tools for documentation.",
+  "repository": {
+    "url": "https://github.com/vipulsutar11/mst-mcp",
+    "source": "github"
   },
-  "installation": {
-    "type": "pip",
-    "requirements": [
-      "mcp==2.0.0"
-    ]
-  }
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "docker.io/vipulsutar11/mst-mcp:1.0.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
 }
