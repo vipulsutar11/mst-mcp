@@ -1,95 +1,153 @@
-# MST-MCP Server
+# MCP Registry
 
-An MCP (Model Context Protocol) server designed for the MST Chain ecosystem. This server provides tools and resources to access MST Chain documentation, smart contract deployment guides, gas, EVM details, transactions, and network validator structures.
+The MCP registry provides MCP clients with a list of MCP servers, like an app store for MCP servers.
 
-## Features
+[**📤 Publish my MCP server**](docs/modelcontextprotocol-io/quickstart.mdx) | [**⚡️ Live API docs**](https://registry.modelcontextprotocol.io/docs) | [**👀 Ecosystem vision**](docs/design/ecosystem-vision.md) | 📖 **[Full documentation](./docs)**
 
-- **Documentation Access**: Retrieve articles, guides, and tutorials on the MST Chain (smart contracts, accounts, gas, networks, EVM details, etc.).
-- **Search & Retrieval**: Easily search keywords across all documentation files or read specific articles.
-- **MCP Integration**: Fully compatible with AI assistants and IDEs (Cursor, Claude Desktop, Windsurf).
+## Development Status
 
----
+**2025-10-24 update**: The Registry API has entered an **API freeze (v0.1)** 🎉. For the next month or more, the API will remain stable with no breaking changes, allowing integrators to confidently implement support. This freeze applies to v0.1 while development continues on v0. We'll use this period to validate the API in real-world integrations and gather feedback to shape v1 for general availability. Thank you to everyone for your contributions and patience—your involvement has been key to getting us here!
 
-## Quick Setup (No Installation Required)
+**2025-09-08 update**: The registry has launched in preview 🎉 ([announcement blog post](https://blog.modelcontextprotocol.io/posts/2025-09-08-mcp-registry-preview/)). While the system is now more stable, this is still a preview release and breaking changes or data resets may occur. A general availability (GA) release will follow later. We'd love your feedback in [GitHub discussions](https://github.com/modelcontextprotocol/registry/discussions/new?category=ideas) or in the [#registry-dev Discord](https://discord.com/channels/1358869848138059966/1369487942862504016) ([joining details here](https://modelcontextprotocol.io/community/communication)).
 
-Since this server is hosted in the cloud, you can connect it directly to your AI assistant without setting up Python or running containers locally.
+Registry Working Group:
+- **Radoslav (Rado) Dimitrov** (Stacklok) [@rdimitrov](https://github.com/rdimitrov) - WG Lead
+- **Tadas Antanavicius** (PulseMCP) [@tadasant](https://github.com/tadasant)
+- **Bob Dickinson** (TeamSpark) [@BobDickinson](https://github.com/BobDickinson)
+- **Preeti (Pree) Dewani** (Ravenmail) [@pree-dew](https://github.com/pree-dew)
 
-### Claude Desktop Configuration
-Add the following to your configuration file (located at `%APPDATA%\Claude\claude_desktop_config.json` on Windows or `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+## Contributing
 
-```json
-{
-  "mcpServers": {
-    "mst-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-proxy",
-        "https://glama.ai/mcp/instances/YOUR_GLAMA_INSTANCE_ID/sse"
-      ]
-    }
-  }
-}
-```
+We use multiple channels for collaboration - see [modelcontextprotocol.io/community/communication](https://modelcontextprotocol.io/community/communication).
 
-> [!IMPORTANT]
-> Make sure to replace `https://glama.ai/mcp/instances/YOUR_GLAMA_INSTANCE_ID/sse` with the actual unique URL generated in your [Glama settings page](https://glama.ai/settings/mcp/servers).
+Often (but not always) ideas flow through this pipeline:
 
-### Cursor Configuration
-1. Go to **Cursor Settings** > **Features** > **MCP**.
-2. Click **+ Add New MCP Server**.
-3. Configure the following:
-   - **Name**: `mst-mcp`
-   - **Type**: `SSE`
-   - **URL**: `https://glama.ai/mcp/gateway/vipulsutar11/mst-mcp`
+- **[Discord](https://modelcontextprotocol.io/community/communication)** - Real-time community discussions
+- **[Discussions](https://github.com/modelcontextprotocol/registry/discussions)** - Propose and discuss product/technical requirements
+- **[Issues](https://github.com/modelcontextprotocol/registry/issues)** - Track well-scoped technical work  
+- **[Pull Requests](https://github.com/modelcontextprotocol/registry/pulls)** - Contribute work towards issues
 
----
+### Quick start:
 
-## Local Setup & Development
+#### Pre-requisites
 
-If you want to run the server locally or build/deploy it yourself:
+- **Docker**
+- **Go 1.24.x**
+- **ko** - Container image builder for Go ([installation instructions](https://ko.build/install/))
+- **golangci-lint v2.4.0**
 
-### Prerequisites
-- Python 3.10 or higher
+#### Running the server
 
-### 1. Clone the repository
 ```bash
-git clone https://github.com/vipulsutar11/mst-mcp.git
-cd mst-mcp
+# Start full development environment
+make dev-compose
 ```
 
-### 2. Install dependencies
+This starts the registry at [`localhost:8080`](http://localhost:8080) with PostgreSQL. The database uses ephemeral storage and is reset each time you restart the containers, ensuring a clean state for development and testing.
+
+**Note:** The registry uses [ko](https://ko.build) to build container images. The `make dev-compose` command automatically builds the registry image with ko and loads it into your local Docker daemon before starting the services.
+
+By default, the registry seeds from the production API with a filtered subset of servers (to keep startup fast). This ensures your local environment mirrors production behavior and all seed data passes validation. For offline development you can seed from a file without validation with `MCP_REGISTRY_SEED_FROM=data/seed.json MCP_REGISTRY_ENABLE_REGISTRY_VALIDATION=false make dev-compose`.
+
+The setup can be configured with environment variables in [docker-compose.yml](./docker-compose.yml) - see [.env.example](./.env.example) for a reference.
+
+<details>
+<summary>Alternative: Running a pre-built Docker image</summary>
+
+Pre-built Docker images are automatically published to GitHub Container Registry. Note that the image does not bundle PostgreSQL, so you need to run your own and point the registry at it via `MCP_REGISTRY_DATABASE_URL` (see [docker-compose.yml](./docker-compose.yml) for a working example):
+
 ```bash
-pip install -r requirements.txt
+# Run latest stable release
+docker run -p 8080:8080 ghcr.io/modelcontextprotocol/registry:latest
+
+# Run latest from main branch (continuous deployment)
+docker run -p 8080:8080 ghcr.io/modelcontextprotocol/registry:main
+
+# Run specific release version
+docker run -p 8080:8080 ghcr.io/modelcontextprotocol/registry:v1.0.0
+
+# Run development build from main branch
+docker run -p 8080:8080 ghcr.io/modelcontextprotocol/registry:main-20250906-abc123d
 ```
 
-### 3. Run the Server
-To run the server locally in STDIO mode:
+**Available tags:** 
+- **Releases**: `latest`, `v1.0.0`, `v1.1.0`, etc.
+- **Continuous**: `main` (latest main branch build)
+- **Development**: `main-<date>-<sha>` (specific commit builds)
+
+</details>
+
+#### Publishing a server
+
+To publish a server, we've built a simple CLI. You can use it with:
+
 ```bash
-python server.py
+# Build the latest CLI
+make publisher
+
+# Use it!
+./bin/mcp-publisher --help
 ```
 
-### 4. Configure Local AI Client (Claude Desktop)
-Add the local server configuration:
-```json
-{
-  "mcpServers": {
-    "mst-mcp-local": {
-      "command": "python",
-      "args": ["/absolute/path/to/server.py"]
-    }
-  }
-}
+See [the publisher guide](./docs/modelcontextprotocol-io/quickstart.mdx) for more details.
+
+#### Other commands
+
+```bash
+# Run lint, unit tests and integration tests
+make check
 ```
 
----
+There are also a few more helpful commands for development. Run `make help` to learn more, or look in [Makefile](./Makefile).
 
-## Deploying & Hosting
+<!--
+For Claude and other AI tools: Always prefer make targets over custom commands where possible.
+-->
 
-This project is configured for cloud deployment:
-* **Glama**: Configured using `glama.json` and `Dockerfile`. It can be deployed in a sandbox container.
-* **Smithery**: Configured using `smithery.yaml`. Can be installed easily by anyone using:
-  ```bash
-  npx -y @smithery/cli install @vipulsutar11/mst-mcp
-  ```
+## Architecture
 
+### Project Structure
+
+```
+├── cmd/                     # Application entry points
+│   └── publisher/           # Server publishing tool
+├── data/                    # Seed data
+├── deploy/                  # Deployment configuration (Pulumi)
+├── docs/                    # Documentation
+├── internal/                # Private application code
+│   ├── api/                 # HTTP handlers and routing
+│   ├── auth/                # Authentication (GitHub OAuth, JWT, namespace blocking)
+│   ├── config/              # Configuration management
+│   ├── database/            # Data persistence (PostgreSQL)
+│   ├── service/             # Business logic
+│   ├── telemetry/           # Metrics and monitoring
+│   └── validators/          # Input validation
+├── pkg/                     # Public packages
+│   ├── api/                 # API types and structures
+│   │   └── v0/              # Version 0 API types
+│   └── model/               # Data models for server.json
+├── scripts/                 # Development and testing scripts
+├── tests/                   # Integration tests
+└── tools/                   # CLI tools and utilities
+    └── validate-*.sh        # Schema validation tools
+```
+
+### Authentication
+
+Publishing supports multiple authentication methods:
+- **GitHub OAuth** - For publishing by logging into GitHub
+- **GitHub OIDC** - For publishing from GitHub Actions
+- **DNS verification** - For proving ownership of a domain and its subdomains
+- **HTTP verification** - For proving ownership of a domain
+
+The registry validates namespace ownership when publishing. E.g. to publish...:
+- `io.github.domdomegg/my-cool-mcp` you must login to GitHub as `domdomegg`, or be in a GitHub Action on domdomegg's repos
+- `me.adamjones/my-cool-mcp` you must prove ownership of `adamjones.me` via DNS or HTTP challenge
+
+## Community Projects
+
+Check out [community projects](docs/community-projects.md) to explore notable registry-related work created by the community.
+
+## More documentation
+
+See the [documentation](./docs) for more details if your question has not been answered here!
