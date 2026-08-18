@@ -249,7 +249,13 @@ if __name__ == "__main__":
         print(f"Starting SSE MCP server on port {port}...")
         print(f"OAuth Client ID configured: {CLIENT_ID}")
         print(f"OAuth Client Secret configured: {CLIENT_SECRET}")
-        uvicorn.run("server:app", host="0.0.0.0", port=port)
+        uvicorn.run(
+            "server:app",
+            host="0.0.0.0",
+            port=port,
+            proxy_headers=True,
+            forwarded_allow_ips="*"
+        )
     elif sys.stdin.isatty():
         print("==================================================")
         print("MST-MCP Server")
