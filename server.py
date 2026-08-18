@@ -4,6 +4,9 @@ from mcp.server import MCPServer
 from mcp.types import Resource
 import os
 import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 
 mcp = MCPServer("MST-MCP")
 
