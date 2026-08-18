@@ -83,8 +83,40 @@ def search_documents(query: str) -> dict[str, list[str]]:
     return results
 
 
+# Create Starlette app for SSE transport
+from starlette.applications import Starlette
+from starlette.routing import Route, Mount
+from mcp.server.sse import SseServerTransport
+
+sse = SseServerTransport("/messages/")
+
+async def handle_sse(request):
+    async with sse.connect_sse(
+        request.scope, request.receive, request._send
+    ) as streams:
+        await mcp.run(
+            streams[0],
+            streams[1],
+            mcp.create_initialization_options(),
+        )
+
+app = Starlette(
+    debug=True,
+    routes=[
+        Route("/sse", endpoint=handle_sse),
+        Mount("/messages/", app=sse.handle_post_message),
+    ],
+)
+
+
 if __name__ == "__main__":
-    if sys.stdin.isatty():
+    port_env = os.environ.get("PORT")
+    if port_env:
+        import uvicorn
+        port = int(port_env)
+        print(f"Starting SSE MCP server on port {port}...")
+        uvicorn.run("server:app", host="0.0.0.0", port=port)
+    elif sys.stdin.isatty():
         print("==================================================")
         print("MST-MCP Server")
         print("==================================================")
