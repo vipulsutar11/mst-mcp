@@ -1,6 +1,8 @@
 # Use a lightweight official Python image
 FROM python:3.11-slim
 
+LABEL io.modelcontextprotocol.server.name="io.github.vipulsutar11/mst-mcp"
+
 # Set working directory
 WORKDIR /app
 
