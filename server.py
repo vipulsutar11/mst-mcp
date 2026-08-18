@@ -222,10 +222,10 @@ async def handle_sse(request):
     async with sse.connect_sse(
         request.scope, request.receive, request._send
     ) as streams:
-        await mcp.run(
+        await mcp._lowlevel_server.run(
             streams[0],
             streams[1],
-            mcp.create_initialization_options(),
+            mcp._lowlevel_server.create_initialization_options(),
         )
 
 app = Starlette(
