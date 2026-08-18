@@ -189,6 +189,9 @@ async def handle_sse(request):
             }
         )
 
+    if request.method == "POST":
+        return await sse.handle_post_message(request)
+
     async with sse.connect_sse(
         request.scope, request.receive, request._send
     ) as streams:
@@ -205,7 +208,7 @@ app = Starlette(
         Route("/.well-known/oauth-authorization-server", endpoint=handle_authorization_server, methods=["GET"]),
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
         Route("/token", endpoint=handle_token, methods=["POST"]),
-        Route("/sse", endpoint=handle_sse),
+        Route("/sse", endpoint=handle_sse, methods=["GET", "POST"]),
         Mount("/messages/", app=sse.handle_post_message),
     ],
 )
