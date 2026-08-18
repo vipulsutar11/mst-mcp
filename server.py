@@ -227,6 +227,8 @@ async def handle_sse(request):
             streams[1],
             mcp._lowlevel_server.create_initialization_options(),
         )
+    from starlette.responses import Response
+    return Response()
 
 app = Starlette(
     debug=True,
