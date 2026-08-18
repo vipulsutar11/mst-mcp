@@ -109,6 +109,13 @@ async def handle_authorize(request):
     redirect_uri = params.get("redirect_uri")
     state = params.get("state")
     
+async def handle_authorize(request):
+    params = request.query_params
+    client_id = params.get("client_id")
+    redirect_uri = params.get("redirect_uri")
+    state = params.get("state")
+    
+    # Strictly validate against the environment variable CLIENT_ID (loaded from .env / Render env)
     if client_id != CLIENT_ID:
         return JSONResponse({"error": "invalid_client"}, status_code=400)
     
@@ -124,11 +131,26 @@ async def handle_authorize(request):
     return RedirectResponse(url=callback_url)
 
 async def handle_token(request):
+    # Try parsing client credentials from Basic Auth header first
+    auth_header = request.headers.get("Authorization")
+    client_id = None
+    client_secret = None
+    if auth_header and auth_header.startswith("Basic "):
+        import base64
+        try:
+            decoded = base64.b64decode(auth_header.split(" ")[1]).decode("utf-8")
+            client_id, client_secret = decoded.split(":", 1)
+        except Exception:
+            pass
+
     form_data = await request.form()
-    client_id = form_data.get("client_id")
-    client_secret = form_data.get("client_secret")
+    if not client_id:
+        client_id = form_data.get("client_id")
+    if not client_secret:
+        client_secret = form_data.get("client_secret")
     code = form_data.get("code")
     
+    # Strictly validate against environmental CLIENT_ID and CLIENT_SECRET
     if client_id != CLIENT_ID or client_secret != CLIENT_SECRET or code not in auth_codes:
         return JSONResponse({"error": "invalid_grant"}, status_code=400)
     
