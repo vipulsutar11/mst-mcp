@@ -1,0 +1,22 @@
+{
+  "name": "mst-mcp",
+  "displayName": "MST-MCP",
+  "description": "An MCP server designed for the MST Chain ecosystem that provides search and retrieval tools for documentation.",
+  "version": "1.0.0",
+  "repository": "https://github.com/vipulsutar11/mst-mcp",
+  "publisher": "vipulsutar11",
+  "runtime": "python",
+  "entrypoint": "server.py",
+  "startCommand": {
+    "command": "python",
+    "args": [
+      "server.py"
+    ]
+  },
+  "installation": {
+    "type": "pip",
+    "requirements": [
+      "mcp==2.0.0"
+    ]
+  }
+}
