@@ -86,6 +86,7 @@ def search_documents(query: str) -> dict[str, list[str]]:
 # Create Starlette app for SSE transport
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
+# pyrefly: ignore [missing-import]
 from mcp.server.sse import SseServerTransport
 
 sse = SseServerTransport("/messages/")
