@@ -139,15 +139,55 @@ async def handle_token(request):
         "token_type": "Bearer"
     })
 
+async def handle_protected_resource(request):
+    base_url = str(request.base_url).rstrip('/')
+    return JSONResponse({
+        "resource": base_url,
+        "authorization_servers": [
+            base_url
+        ],
+        "scopes_supported": [
+            "mcp"
+        ],
+        "bearer_methods_supported": [
+            "header"
+        ]
+    })
+
+async def handle_authorization_server(request):
+    base_url = str(request.base_url).rstrip('/')
+    return JSONResponse({
+        "issuer": base_url,
+        "authorization_endpoint": f"{base_url}/authorize",
+        "token_endpoint": f"{base_url}/token",
+        "scopes_supported": ["mcp"],
+        "response_types_supported": ["code"],
+        "grant_types_supported": ["authorization_code"],
+        "code_challenge_methods_supported": ["S256"]
+    })
+
 async def handle_sse(request):
     # Verify access token
     auth_header = request.headers.get("Authorization")
+    base_url = str(request.base_url).rstrip('/')
     if not auth_header or not auth_header.startswith("Bearer "):
-        return JSONResponse({"error": "unauthorized"}, status_code=401)
+        return JSONResponse(
+            {"error": "unauthorized"}, 
+            status_code=401,
+            headers={
+                "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
+            }
+        )
         
     token = auth_header.split(" ")[1]
     if token not in access_tokens:
-        return JSONResponse({"error": "forbidden"}, status_code=403)
+        return JSONResponse(
+            {"error": "forbidden"}, 
+            status_code=403,
+            headers={
+                "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
+            }
+        )
 
     async with sse.connect_sse(
         request.scope, request.receive, request._send
@@ -161,6 +201,8 @@ async def handle_sse(request):
 app = Starlette(
     debug=True,
     routes=[
+        Route("/.well-known/oauth-protected-resource", endpoint=handle_protected_resource, methods=["GET"]),
+        Route("/.well-known/oauth-authorization-server", endpoint=handle_authorization_server, methods=["GET"]),
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
         Route("/token", endpoint=handle_token, methods=["POST"]),
         Route("/sse", endpoint=handle_sse),
