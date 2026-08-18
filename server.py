@@ -86,12 +86,69 @@ def search_documents(query: str) -> dict[str, list[str]]:
 # Create Starlette app for SSE transport
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
+from starlette.responses import RedirectResponse, JSONResponse
 # pyrefly: ignore [missing-import]
 from mcp.server.sse import SseServerTransport
 
+# Configuration for OAuth (Use environment variables or secure defaults)
+CLIENT_ID = os.environ.get("OAUTH_CLIENT_ID", "mst-mcp-client")
+CLIENT_SECRET = os.environ.get("OAUTH_CLIENT_SECRET", "mst-mcp-secret")
+
+# Simple in-memory storage for authorization codes and access tokens
+auth_codes = set()
+access_tokens = set()
+
 sse = SseServerTransport("/messages/")
 
+async def handle_authorize(request):
+    params = request.query_params
+    client_id = params.get("client_id")
+    redirect_uri = params.get("redirect_uri")
+    state = params.get("state")
+    
+    if client_id != CLIENT_ID:
+        return JSONResponse({"error": "invalid_client"}, status_code=400)
+    
+    # Generate a temporary authorization code
+    code = "auth_code_" + os.urandom(8).hex()
+    auth_codes.add(code)
+    
+    # Redirect back to Claude with the code and state
+    callback_url = f"{redirect_uri}?code={code}"
+    if state:
+        callback_url += f"&state={state}"
+        
+    return RedirectResponse(url=callback_url)
+
+async def handle_token(request):
+    form_data = await request.form()
+    client_id = form_data.get("client_id")
+    client_secret = form_data.get("client_secret")
+    code = form_data.get("code")
+    
+    if client_id != CLIENT_ID or client_secret != CLIENT_SECRET or code not in auth_codes:
+        return JSONResponse({"error": "invalid_grant"}, status_code=400)
+    
+    # Clean up authorization code and issue access token
+    auth_codes.remove(code)
+    token = "token_" + os.urandom(16).hex()
+    access_tokens.add(token)
+    
+    return JSONResponse({
+        "access_token": token,
+        "token_type": "Bearer"
+    })
+
 async def handle_sse(request):
+    # Verify access token
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+        
+    token = auth_header.split(" ")[1]
+    if token not in access_tokens:
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+
     async with sse.connect_sse(
         request.scope, request.receive, request._send
     ) as streams:
@@ -104,6 +161,8 @@ async def handle_sse(request):
 app = Starlette(
     debug=True,
     routes=[
+        Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
+        Route("/token", endpoint=handle_token, methods=["POST"]),
         Route("/sse", endpoint=handle_sse),
         Mount("/messages/", app=sse.handle_post_message),
     ],
