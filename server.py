@@ -8,29 +8,35 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# WebP Base64 encoded icon string to serve as local data URI
+# PNG Base64 encoded icon string to serve as local data URI
 ICON_BASE64 = (
-    "data:image/webp;base64,"
-    "UklGRjYFAABXRUJQVlA4TCkFAAAvHwAHEDVJirb/kZR//3//1GFyHnLOOedTMrAWuKEBP2sCaWnT4OBFwhYScJQEo"
-    "AUTcxwcdK0FtCACM+2iz7sWkDDIyGa6CilrC5KtbWuTsB2mbKBTFsCwC+AwpCOs7hppfqvi7jJ0d3eot/EEd4AUSZI"
-    "jyaN6ZvYkgGNz/Lno50oJkCSZthX32bZt27Zt27Zt27bf+7Zt27b9z+kJYPXqHxWdBW5dnjbKiorJq38ULuxhstc98"
-    "unWKV6C+kdNIsjXKhgSUQ+xRw2jnlhFf5WUGN5GRaSkg0NOLNSjQ1EokyoIZcPqH3SlX5Lsn2Qhi0mgnFBB64qJ1vx"
-    "RvxBK0+mZtushsNj9gfWVj2oyFVZsTy7KPLuwhz0L7sYG9196IOY0UU5kSv1ecPQC0TukhZUKATQmfWCILz03DeYTq"
-    "DiTwWEU13OrdIbuNK1emsCwg7ghvXvloaWJTEmKStV30DrU7jnjz1wKSaMknPIfhkAtwpVyTXPGq2c5UbzLvWiVpLY"
-    "itQKG9KPppf6gEb2H95vS/4DDnbpjwsDPtRQEoTH1B6L2dXBE+WoEozHcj8ogWfCwLVJGiEmBZENKS6VcQ0njjoXW/"
-    "V2PS1rxpalTfyGq9E9SESYZYm55EqD9uh8s9rhjexGiWh2LI6id4GBuFI8u92LrHpIV1ad1X1xrLt5pPQgeukgtuhl"
-    "a5I/0PhC4aadc1ZTavajoFWZZQQJeMDcX1ZdR9Vks823uW9INgV9ZhHijuj9Y7FvHTwdlRbWKiqNZ3EZzO3eSkzTuW"
-    "GsVoX4hzk8tTymUAG2XfrDIi37bK3/bR8Qib6QPPGxtVVPioir1DVpF1m/Z40QncqO4c7gfD7R9DCzxQ3oh4fSRMIq"
-    "kO5gEZPTypFyhYLhFSVTv1R94YRbIchJm0SvUcqKYFgR+ejYs8rMe3HW3PXL1q8POnTZj5udKXjCTi+bTeIfc9cAXq"
-    "9E8yJ3o8DY/K95b7MU/D+0kZfhtvU7ZyaJcZkr9drPTGkL9QJzTQFyaJvUL2ohoX7BFLaKBkpSRvWGSkMX44tDslj6"
-    "wyPORjRgV8JOHDWit3LHcqN27a8E83KQoqs/qC0JRFwXws7rahNGBjkvfAw539Wkdqnps17XYz40AppsSmJIVxM5mT"
-    "X5i8aLNfOZLLafXAhp5Wt0LghcQWpQVjbKiImZnTFLwMaEVEsAMfP/W9tJnTsXBebxGcy93VQdpX7CxNZ9E6IERXL"
-    "CCU75oZ3als7Mj5IKPGHxyYA5IX5Ae/2UIXKq37XbCAys+Czz995aKkrgw9W8iDZqnwrgbxPyEQsPSqiALi/HEV5NE"
-    "GuCWZ00ktJh6gM5dM2YSWqtkwueM5kNJ65ShvPit3kHpkVrqs6m55GrG4ryU1imjwRG+RQo1wLBtOcbs1MUM1/2WN7"
-    "5HFPqjLf/cA9tFL+alOr5FC9wyyA8hyA2b7t6o9Z0HWuecXNk+ET3Qsj/RD+S5+gP9CCJ4ZcTZFwo60psV1D44lI5M"
-    "Yv3fdZ5kG8GbjwO6LOi4QX3+sqlHgx4BkwUDfbfAjcBZbjkPZYAL1g+mxvGuleSEhYJOV32cENHbyIhU/yHP1VfQqr"
-    "/u2jUL3DMJAyADIMeBekHg/0zqGeBszdm1GaRm0/HSuGO6ZMGoCpYunuFYP3yZhvysl2peZG6pWXfoy+InmDTJMFAn"
-    "xzvQuAMe27is+BufKoZJ0uVFVXF0qlaRKOGUbN0wYqutX6opLnlH59pCPEpS9jlMnCSfEyhAqjKD3MAAA=="
+    "data:image/png;base64,"
+    "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"
 )
 
 mcp = MCPServer(
@@ -40,10 +46,11 @@ mcp = MCPServer(
         Icon(
             src=ICON_BASE64,
             sizes=["512x512"],
-            type="image/webp"
+            mime_type="image/png"
         )
     ]
 )
+
 
 
 
