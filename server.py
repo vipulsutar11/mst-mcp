@@ -1,27 +1,24 @@
 # pyrefly: ignore [missing-import]
 from mcp.server import MCPServer
 # pyrefly: ignore [missing-import]
-from mcp.types import Resource, Implementation
+from mcp.types import Resource, Icon
 import os
 import sys
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Instantiate server with custom icon branding metadata
+# Instantiate server with custom icon branding metadata properties directly
 mcp = MCPServer(
     name="MST-MCP",
-    implementation=Implementation(
-        name="MST-MCP",
-        version="1.0.0",
-        icons=[
-            {
-                "src": "https://mst-mcp.onrender.com/icon.png",
-                "sizes": ["512x512"],
-                "type": "image/png"
-            }
-        ]
-    )
+    version="1.0.0",
+    icons=[
+        Icon(
+            src="https://mst-mcp.onrender.com/icon.png",
+            sizes=["512x512"],
+            type="image/png"
+        )
+    ]
 )
 
 DOCS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Docuements")
