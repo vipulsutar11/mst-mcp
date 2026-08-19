@@ -1,0 +1,22 @@
+{
+  "name": "mst-mcp",
+  "version": "1.0.0",
+  "description": "Installer for MST MCP configurations",
+  "main": "bin/install.js",
+  "bin": {
+    "mst-mcp": "./bin/install.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "mst-mcp",
+    "installer"
+  ],
+  "author": "",
+  "license": "ISC"
+}
