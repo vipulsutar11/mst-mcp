@@ -206,27 +206,28 @@ async def handle_authorization_server(request):
     })
 
 async def handle_sse(request):
-    # Verify access token bypassed for testing direct Claude connection
-    # auth_header = request.headers.get("Authorization")
-    # base_url = "https://mst-mcp.onrender.com"
-    # if not auth_header or not auth_header.startswith("Bearer "):
-    #     return JSONResponse(
-    #         {"error": "unauthorized"}, 
-    #         status_code=401,
-    #         headers={
-    #             "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
-    #         }
-    #     )
-    #     
-    # token = auth_header.split(" ")[1]
-    # if token not in access_tokens:
-    #     return JSONResponse(
-    #         {"error": "forbidden"}, 
-    #         status_code=403,
-    #         headers={
-    #             "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
-    #         }
-    #     )
+    # Verify access token
+    auth_header = request.headers.get("Authorization")
+    base_url = "https://mst-mcp.onrender.com"
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return JSONResponse(
+            {"error": "unauthorized"}, 
+            status_code=401,
+            headers={
+                "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
+            }
+        )
+        
+    token = auth_header.split(" ")[1]
+    if token not in access_tokens:
+        return JSONResponse(
+            {"error": "forbidden"}, 
+            status_code=403,
+            headers={
+                "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
+            }
+        )
+
 
 
 

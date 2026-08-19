@@ -31,16 +31,16 @@ if (isWindows) {
 }
 const cursorConfigPath = path.join(cursorConfigDir, 'globalStorage', 'storage.json');
 
-// Target Configuration Details (utilizing official stdio-to-sse bridge)
+// Target Configuration Details (utilizing direct SSE transport configuration)
 const serverConfig = {
-    command: process.platform === 'win32' ? 'npx.cmd' : 'npx',
-    args: [
-        "-y",
-        "@modelcontextprotocol/mcp-server-sse",
-        "https://mst-mcp.onrender.com/sse"
-    ],
-    env: {}
+    type: "sse",
+    url: "https://mst-mcp.onrender.com/sse",
+    env: {
+        OAUTH_CLIENT_ID: "mst-mcp-client",
+        OAUTH_CLIENT_SECRET: "mst-mcp-secret-key-350e3445"
+    }
 };
+
 
 
 
