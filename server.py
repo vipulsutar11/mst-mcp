@@ -16,7 +16,7 @@ mcp = MCPServer(
         icons=[
             {
                 "src": "https://mst-mcp.onrender.com/icon.png",
-                "sizes": "512x512",
+                "sizes": ["512x512"],
                 "type": "image/png"
             }
         ]
