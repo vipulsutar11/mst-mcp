@@ -33,7 +33,7 @@ const cursorConfigPath = path.join(cursorConfigDir, 'globalStorage', 'storage.js
 
 // Target Configuration Details (utilizing official stdio-to-sse bridge)
 const serverConfig = {
-    command: "npx",
+    command: process.platform === 'win32' ? 'npx.cmd' : 'npx',
     args: [
         "-y",
         "@modelcontextprotocol/mcp-server-sse",
@@ -41,6 +41,7 @@ const serverConfig = {
     ],
     env: {}
 };
+
 
 
 
