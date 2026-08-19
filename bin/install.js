@@ -39,11 +39,9 @@ const serverConfig = {
         "@modelcontextprotocol/mcp-server-sse",
         "https://mst-mcp.onrender.com/sse"
     ],
-    env: {
-        OAUTH_CLIENT_ID: "mst-mcp-client",
-        OAUTH_CLIENT_SECRET: "mst-mcp-secret-key-350e3445"
-    }
+    env: {}
 };
+
 
 
 
