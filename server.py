@@ -1,14 +1,48 @@
-# pyrefly: ignore [missing-import]
-from mcp.server import MCPServer
-# pyrefly: ignore [missing-import]
-from mcp.types import Resource
+from mcp.types import Resource, Icon
 import os
 import sys
 from dotenv import load_dotenv
 
 load_dotenv()
 
-mcp = MCPServer("MST-MCP")
+# WebP Base64 encoded icon string to serve as local data URI
+ICON_BASE64 = (
+    "data:image/webp;base64,"
+    "UklGRjYFAABXRUJQVlA4TCkFAAAvHwAHEDVJirb/kZR//3//1GFyHnLOOedTMrAWuKEBP2sCaWnT4OBFwhYScJQEo"
+    "AUTcxwcdK0FtCACM+2iz7sWkDDIyGa6CilrC5KtbWuTsB2mbKBTFsCwC+AwpCOs7hppfqvi7jJ0d3eot/EEd4AUSZI"
+    "jyaN6ZvYkgGNz/Lno50oJkCSZthX32bZt27Zt27Zt27bf+7Zt27b9z+kJYPXqHxWdBW5dnjbKiorJq38ULuxhstc98"
+    "unWKV6C+kdNIsjXKhgSUQ+xRw2jnlhFf5WUGN5GRaSkg0NOLNSjQ1EokyoIZcPqH3SlX5Lsn2Qhi0mgnFBB64qJ1vx"
+    "RvxBK0+mZtushsNj9gfWVj2oyFVZsTy7KPLuwhz0L7sYG9196IOY0UU5kSv1ecPQC0TukhZUKATQmfWCILz03DeYTq"
+    "DiTwWEU13OrdIbuNK1emsCwg7ghvXvloaWJTEmKStV30DrU7jnjz1wKSaMknPIfhkAtwpVyTXPGq2c5UbzLvWiVpLY"
+    "itQKG9KPppf6gEb2H95vS/4DDnbpjwsDPtRQEoTH1B6L2dXBE+WoEozHcj8ogWfCwLVJGiEmBZENKS6VcQ0njjoXW/"
+    "V2PS1rxpalTfyGq9E9SESYZYm55EqD9uh8s9rhjexGiWh2LI6id4GBuFI8u92LrHpIV1ad1X1xrLt5pPQgeukgtuhl"
+    "a5I/0PhC4aadc1ZTavajoFWZZQQJeMDcX1ZdR9Vks823uW9INgV9ZhHijuj9Y7FvHTwdlRbWKiqNZ3EZzO3eSkzTuW"
+    "GsVoX4hzk8tTymUAG2XfrDIi37bK3/bR8Qib6QPPGxtVVPioir1DVpF1m/Z40QncqO4c7gfD7R9DCzxQ3oh4fSRMIq"
+    "kO5gEZPTypFyhYLhFSVTv1R94YRbIchJm0SvUcqKYFgR+ejYs8rMe3HW3PXL1q8POnTZj5udKXjCTi+bTeIfc9cAXq"
+    "9E8yJ3o8DY/K95b7MU/D+0kZfhtvU7ZyaJcZkr9drPTGkL9QJzTQFyaJvUL2ohoX7BFLaKBkpSRvWGSkMX44tDslj6"
+    "wyPORjRgV8JOHDWit3LHcqN27a8E83KQoqs/qC0JRFwXws7rahNGBjkvfAw539Wkdqnps17XYz40AppsSmJIVxM5mT"
+    "X5i8aLNfOZLLafXAhp5Wt0LghcQWpQVjbKiImZnTFLwMaEVEsAMfP/W9tJnTsXBebxGcy93VQdpX7CxNZ9E6IERXL"
+    "CCU75oZ3als7Mj5IKPGHxyYA5IX5Ae/2UIXKq37XbCAys+Czz995aKkrgw9W8iDZqnwrgbxPyEQsPSqiALi/HEV5NE"
+    "GuCWZ00ktJh6gM5dM2YSWqtkwueM5kNJ65ShvPit3kHpkVrqs6m55GrG4ryU1imjwRG+RQo1wLBtOcbs1MUM1/2WN7"
+    "5HFPqjLf/cA9tFL+alOr5FC9wyyA8hyA2b7t6o9Z0HWuecXNk+ET3Qsj/RD+S5+gP9CCJ4ZcTZFwo60psV1D44lI5M"
+    "Yv3fdZ5kG8GbjwO6LOi4QX3+sqlHgx4BkwUDfbfAjcBZbjkPZYAL1g+mxvGuleSEhYJOV32cENHbyIhU/yHP1VfQqr"
+    "/u2jUL3DMJAyADIMeBekHg/0zqGeBszdm1GaRm0/HSuGO6ZMGoCpYunuFYP3yZhvysl2peZG6pWXfoy+InmDTJMFAn"
+    "xzvQuAMe27is+BufKoZJ0uVFVXF0qlaRKOGUbN0wYqutX6opLnlH59pCPEpS9jlMnCSfEyhAqjKD3MAAA=="
+)
+
+mcp = MCPServer(
+    name="MST-MCP",
+    version="1.0.0",
+    icons=[
+        Icon(
+            src=ICON_BASE64,
+            sizes=["512x512"],
+            type="image/webp"
+        )
+    ]
+)
+
+
 
 DOCS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Docuements")
 
