@@ -1,28 +1,16 @@
 # pyrefly: ignore [missing-import]
 from mcp.server import MCPServer
 # pyrefly: ignore [missing-import]
-from mcp.types import Resource, Icon
+from mcp.types import Resource
 import os
 import sys
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Instantiate server with custom icon branding metadata properties directly
-mcp = MCPServer(
-    name="MST-MCP",
-    version="1.0.0",
-    icons=[
-        Icon(
-            src="https://mst-mcp.onrender.com/icon.png",
-            sizes=["512x512"],
-            type="image/png"
-        )
-    ]
-)
+mcp = MCPServer("MST-MCP")
 
 DOCS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Docuements")
-
 
 
 @mcp.resource("docs://{filename}")
@@ -204,30 +192,27 @@ async def handle_authorization_server(request):
     })
 
 async def handle_sse(request):
-    # Verify access token
-    auth_header = request.headers.get("Authorization")
-    base_url = "https://mst-mcp.onrender.com"
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return JSONResponse(
-            {"error": "unauthorized"}, 
-            status_code=401,
-            headers={
-                "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
-            }
-        )
-        
-    token = auth_header.split(" ")[1]
-    if token not in access_tokens:
-        return JSONResponse(
-            {"error": "forbidden"}, 
-            status_code=403,
-            headers={
-                "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
-            }
-        )
-
-
-
+    # Verify access token bypassed for testing direct Claude connection
+    # auth_header = request.headers.get("Authorization")
+    # base_url = "https://mst-mcp.onrender.com"
+    # if not auth_header or not auth_header.startswith("Bearer "):
+    #     return JSONResponse(
+    #         {"error": "unauthorized"}, 
+    #         status_code=401,
+    #         headers={
+    #             "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
+    #         }
+    #     )
+    #     
+    # token = auth_header.split(" ")[1]
+    # if token not in access_tokens:
+    #     return JSONResponse(
+    #         {"error": "forbidden"}, 
+    #         status_code=403,
+    #         headers={
+    #             "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
+    #         }
+    #     )
 
 
     if request.method == "POST":
@@ -246,22 +231,13 @@ async def handle_sse(request):
     from starlette.responses import Response
     return Response()
 
-from starlette.responses import FileResponse
-
 async def handle_health(request):
     return JSONResponse({"status": "healthy", "server": "MST-MCP"})
-
-async def handle_icon(request):
-    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon.png")
-    if os.path.exists(icon_path):
-        return FileResponse(icon_path, media_type="image/png")
-    return JSONResponse({"error": "Icon not found"}, status_code=404)
 
 app = Starlette(
     debug=True,
     routes=[
         Route("/", endpoint=handle_health, methods=["GET"]),
-        Route("/icon.png", endpoint=handle_icon, methods=["GET"]),
         Route("/.well-known/oauth-protected-resource", endpoint=handle_protected_resource, methods=["GET"]),
         Route("/.well-known/oauth-authorization-server", endpoint=handle_authorization_server, methods=["GET"]),
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
@@ -270,7 +246,6 @@ app = Starlette(
         Mount("/messages/", app=sse.handle_post_message),
     ],
 )
-
 
 
 
