@@ -10,7 +10,8 @@ load_dotenv()
 
 # Instantiate server with custom icon branding metadata
 mcp = MCPServer(
-    Implementation(
+    name="MST-MCP",
+    implementation=Implementation(
         name="MST-MCP",
         version="1.0.0",
         icons=[
