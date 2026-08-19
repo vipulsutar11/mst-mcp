@@ -230,9 +230,13 @@ async def handle_sse(request):
     from starlette.responses import Response
     return Response()
 
+async def handle_health(request):
+    return JSONResponse({"status": "healthy", "server": "MST-MCP"})
+
 app = Starlette(
     debug=True,
     routes=[
+        Route("/", endpoint=handle_health, methods=["GET"]),
         Route("/.well-known/oauth-protected-resource", endpoint=handle_protected_resource, methods=["GET"]),
         Route("/.well-known/oauth-authorization-server", endpoint=handle_authorization_server, methods=["GET"]),
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
@@ -241,6 +245,7 @@ app = Starlette(
         Mount("/messages/", app=sse.handle_post_message),
     ],
 )
+
 
 
 if __name__ == "__main__":
