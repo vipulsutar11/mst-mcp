@@ -133,7 +133,7 @@ def search_documents(query: str) -> dict[str, list[str]]:
 # Create Starlette app for SSE transport
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
-from starlette.responses import RedirectResponse, JSONResponse
+from starlette.responses import RedirectResponse, JSONResponse, FileResponse
 # pyrefly: ignore [missing-import]
 from mcp.server.sse import SseServerTransport
 
@@ -278,10 +278,18 @@ async def handle_sse(request):
 async def handle_health(request):
     return JSONResponse({"status": "healthy", "server": "MST-MCP"})
 
+async def handle_favicon(request):
+    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon.png")
+    if os.path.exists(icon_path):
+        return FileResponse(icon_path, media_type="image/png")
+    return JSONResponse({"error": "Icon not found"}, status_code=404)
+
 app = Starlette(
     debug=True,
     routes=[
         Route("/", endpoint=handle_health, methods=["GET"]),
+        Route("/favicon.ico", endpoint=handle_favicon, methods=["GET"]),
+        Route("/favicon.png", endpoint=handle_favicon, methods=["GET"]),
         Route("/.well-known/oauth-protected-resource", endpoint=handle_protected_resource, methods=["GET"]),
         Route("/.well-known/oauth-authorization-server", endpoint=handle_authorization_server, methods=["GET"]),
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
