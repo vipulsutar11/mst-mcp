@@ -1,4 +1,7 @@
+# pyrefly: ignore [missing-import]
 from mcp.types import Resource, Icon
+# pyrefly: ignore [missing-import]
+from mcp.server import MCPServer
 import os
 import sys
 from dotenv import load_dotenv
