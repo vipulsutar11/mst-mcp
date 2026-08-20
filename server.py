@@ -256,7 +256,7 @@ async def handle_token(request):
     })
 
 async def handle_protected_resource(request):
-    base_url = "https://mst-mcp.onrender.com"
+    base_url = str(request.base_url).rstrip('/')
     return JSONResponse({
         "resource": base_url,
         "authorization_servers": [
@@ -271,7 +271,7 @@ async def handle_protected_resource(request):
     })
 
 async def handle_authorization_server(request):
-    base_url = "https://mst-mcp.onrender.com"
+    base_url = str(request.base_url).rstrip('/')
     return JSONResponse({
         "issuer": base_url,
         "authorization_endpoint": f"{base_url}/authorize",
@@ -285,7 +285,7 @@ async def handle_authorization_server(request):
 async def handle_sse(request):
     # Verify access token bypassed for testing direct Claude connection
     # auth_header = request.headers.get("Authorization")
-    # base_url = "https://mst-mcp.onrender.com"
+    # base_url = str(request.base_url).rstrip('/')
     # if not auth_header or not auth_header.startswith("Bearer "):
     #     return JSONResponse(
     #         {"error": "unauthorized"}, 
