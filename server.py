@@ -73,7 +73,7 @@ def get_doc_resource(filename: str) -> str:
         return f.read()
 
 
-@mcp.tool()
+@mcp.tool(annotations={"title": "List Documents", "readOnlyHint": True})
 def list_documents() -> list[str]:
     """
     Lists the filenames of all available documentation files in the server.
@@ -83,7 +83,7 @@ def list_documents() -> list[str]:
     return [f for f in os.listdir(DOCS_DIR) if os.path.isfile(os.path.join(DOCS_DIR, f))]
 
 
-@mcp.tool()
+@mcp.tool(annotations={"title": "Read Document", "readOnlyHint": True})
 def read_document(filename: str) -> str:
     """
     Reads and returns the contents of a specific documentation file.
@@ -101,7 +101,7 @@ def read_document(filename: str) -> str:
         return f.read()
 
 
-@mcp.tool()
+@mcp.tool(annotations={"title": "Search Documents", "readOnlyHint": True})
 def search_documents(query: str) -> dict[str, list[str]]:
     """
     Searches for a keyword or query inside all documents and returns matching lines with line numbers.
