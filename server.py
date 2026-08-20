@@ -4,6 +4,7 @@ from mcp.types import Resource, Icon
 from mcp.server import MCPServer
 import os
 import sys
+import sqlite3
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -141,18 +142,65 @@ from mcp.server.sse import SseServerTransport
 CLIENT_ID = os.environ.get("OAUTH_CLIENT_ID", "mst-mcp-client")
 CLIENT_SECRET = os.environ.get("OAUTH_CLIENT_SECRET", "mst-mcp-secret")
 
-# Simple in-memory storage for authorization codes and access tokens
-auth_codes = set()
-access_tokens = set()
+# SQLite Storage for authorization codes and access tokens
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "oauth.db")
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS auth_codes (
+            code TEXT PRIMARY KEY,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS access_tokens (
+            token TEXT PRIMARY KEY,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+# Initialize database on startup
+init_db()
+
+def add_auth_code(code: str):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR REPLACE INTO auth_codes (code) VALUES (?)", (code,))
+    conn.commit()
+    conn.close()
+
+def verify_and_remove_auth_code(code: str) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1 FROM auth_codes WHERE code = ?", (code,))
+    exists = cursor.fetchone() is not None
+    if exists:
+        cursor.execute("DELETE FROM auth_codes WHERE code = ?", (code,))
+        conn.commit()
+    conn.close()
+    return exists
+
+def add_access_token(token: str):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR REPLACE INTO access_tokens (token) VALUES (?)", (token,))
+    conn.commit()
+    conn.close()
+
+def is_valid_token(token: str) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1 FROM access_tokens WHERE token = ?", (token,))
+    exists = cursor.fetchone() is not None
+    conn.close()
+    return exists
 
 sse = SseServerTransport("/messages/")
 
-async def handle_authorize(request):
-    params = request.query_params
-    client_id = params.get("client_id")
-    redirect_uri = params.get("redirect_uri")
-    state = params.get("state")
-    
 async def handle_authorize(request):
     params = request.query_params
     client_id = params.get("client_id")
@@ -165,7 +213,7 @@ async def handle_authorize(request):
     
     # Generate a temporary authorization code
     code = "auth_code_" + os.urandom(8).hex()
-    auth_codes.add(code)
+    add_auth_code(code)
     
     # Redirect back to Claude with the code and state
     callback_url = f"{redirect_uri}?code={code}"
@@ -195,13 +243,12 @@ async def handle_token(request):
     code = form_data.get("code")
     
     # Strictly validate against environmental CLIENT_ID and CLIENT_SECRET
-    if client_id != CLIENT_ID or client_secret != CLIENT_SECRET or code not in auth_codes:
+    if client_id != CLIENT_ID or client_secret != CLIENT_SECRET or not verify_and_remove_auth_code(code):
         return JSONResponse({"error": "invalid_grant"}, status_code=400)
     
-    # Clean up authorization code and issue access token
-    auth_codes.remove(code)
+    # Issue access token
     token = "token_" + os.urandom(16).hex()
-    access_tokens.add(token)
+    add_access_token(token)
     
     return JSONResponse({
         "access_token": token,
@@ -249,7 +296,7 @@ async def handle_sse(request):
     #     )
     #     
     # token = auth_header.split(" ")[1]
-    # if token not in access_tokens:
+    # if not is_valid_token(token):
     #     return JSONResponse(
     #         {"error": "forbidden"}, 
     #         status_code=403,
