@@ -337,10 +337,10 @@ async def handle_favicon(request):
         return FileResponse(icon_path, media_type="image/png")
     return JSONResponse({"error": "Icon not found"}, status_code=404)
 
-async def handle_messages(request):
-    from starlette.responses import Response
-    await sse.handle_post_message(request.scope, request.receive, request._send)
-    return Response()
+async def custom_handle_messages(scope, receive, send):
+    # Restore the path so the MCP SDK doesn't get confused by Starlette's Mount stripping it
+    scope["path"] = "/messages/"
+    await sse.handle_post_message(scope, receive, send)
 
 app = Starlette(
     debug=True,
@@ -353,7 +353,7 @@ app = Starlette(
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
         Route("/token", endpoint=handle_token, methods=["POST"]),
         Route("/sse", endpoint=handle_sse, methods=["GET", "POST"]),
-        Route("/messages/", endpoint=handle_messages, methods=["POST"]),
+        Mount("/messages/", app=custom_handle_messages),
         Mount("/public", app=StaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")), name="public"),
     ],
 )
