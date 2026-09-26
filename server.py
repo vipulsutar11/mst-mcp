@@ -285,46 +285,46 @@ async def handle_authorization_server(request):
 
 sse = SseServerTransport("/messages")
 
-async def sse_endpoint(request):
-    # auth_header = request.headers.get("Authorization")
-    # base_url = str(request.base_url).rstrip('/')
+from starlette.requests import Request
+
+async def sse_endpoint(scope, receive, send):
+    request = Request(scope, receive=receive)
+    auth_header = request.headers.get("Authorization")
+    base_url = str(request.base_url).rstrip('/')
     
-    # # Bypass for Antigravity IDE or testing
-    # if auth_header == "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123":
-    #     pass 
-    # else:
-    #     # Normal OAuth flow check
-    #     if not auth_header or not auth_header.startswith("Bearer "):
-    #         return JSONResponse(
-    #             {"error": "unauthorized"}, 
-    #             status_code=401,
-    #             headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
-    #         )
-    #         
-    #     token = auth_header.split(" ")[1]
-    #     if not is_valid_token(token):
-    #         return JSONResponse(
-    #             {"error": "forbidden"}, 
-    #             status_code=403,
-    #             headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
-    #         )
+    # Bypass for Antigravity IDE or testing
+    if auth_header == "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123":
+        pass 
+    else:
+        # Normal OAuth flow check
+        if not auth_header or not auth_header.startswith("Bearer "):
+            response = JSONResponse(
+                {"error": "unauthorized"}, 
+                status_code=401,
+                headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
+            )
+            await response(scope, receive, send)
+            return
             
-    async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
+        token = auth_header.split(" ")[1]
+        if not is_valid_token(token):
+            response = JSONResponse(
+                {"error": "forbidden"}, 
+                status_code=403,
+                headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
+            )
+            await response(scope, receive, send)
+            return
+            
+    async with sse.connect_sse(scope, receive, send) as streams:
         await mcp._lowlevel_server.run(
             streams[0],
             streams[1],
             mcp._lowlevel_server.create_initialization_options(),
         )
-    return Response()
 
-async def messages_endpoint(request):
-    try:
-        await sse.handle_post_message(request.scope, request.receive, request._send)
-    except Exception as e:
-        import traceback
-        return JSONResponse({"error": str(e), "traceback": traceback.format_exc()}, status_code=500)
-    # Return empty response in case handle_post_message doesn't send one (though it should)
-    return Response(status_code=202)
+async def messages_endpoint(scope, receive, send):
+    await sse.handle_post_message(scope, receive, send)
 
 async def handle_health(request):
     from starlette.responses import JSONResponse
