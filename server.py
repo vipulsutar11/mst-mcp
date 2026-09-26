@@ -337,6 +337,11 @@ async def handle_favicon(request):
         return FileResponse(icon_path, media_type="image/png")
     return JSONResponse({"error": "Icon not found"}, status_code=404)
 
+async def handle_messages(request):
+    from starlette.responses import Response
+    await sse.handle_post_message(request.scope, request.receive, request._send)
+    return Response()
+
 app = Starlette(
     debug=True,
     routes=[
@@ -348,7 +353,7 @@ app = Starlette(
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
         Route("/token", endpoint=handle_token, methods=["POST"]),
         Route("/sse", endpoint=handle_sse, methods=["GET", "POST"]),
-        Mount("/messages/", app=sse.handle_post_message),
+        Route("/messages/", endpoint=handle_messages, methods=["POST"]),
         Mount("/public", app=StaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")), name="public"),
     ],
 )
