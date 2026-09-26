@@ -2,7 +2,7 @@ import urllib.request
 import json
 
 # First, GET the SSE endpoint to get the messages URL
-req = urllib.request.Request("https://mcp.mstblockchain.com/sse", method="GET")
+req = urllib.request.Request("https://mst-mcp-xjb5.onrender.com/sse", method="GET", headers={"Authorization": "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123"})
 try:
     with urllib.request.urlopen(req) as response:
         # Read the first event
@@ -20,7 +20,7 @@ try:
         
         # Now try to POST a dummy initialize message to it
         if endpoint_url.startswith("/"):
-            endpoint_url = "https://mcp.mstblockchain.com" + endpoint_url
+            endpoint_url = "https://mst-mcp-xjb5.onrender.com" + endpoint_url
             
         print("Full POST url:", endpoint_url)
         
@@ -35,7 +35,7 @@ try:
             }
         }
         
-        post_req = urllib.request.Request(endpoint_url, data=json.dumps(payload).encode('utf-8'), method="POST", headers={"Content-Type": "application/json"})
+        post_req = urllib.request.Request(endpoint_url, data=json.dumps(payload).encode('utf-8'), method="POST", headers={"Content-Type": "application/json", "Authorization": "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123"})
         try:
             with urllib.request.urlopen(post_req) as post_response:
                 print("POST response:", post_response.status)
