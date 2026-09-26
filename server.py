@@ -287,8 +287,11 @@ sse = SseServerTransport("/messages")
 
 from starlette.requests import Request
 
-async def sse_endpoint(scope, receive, send):
-    request = Request(scope, receive=receive)
+class EmptyResponse(Response):
+    async def __call__(self, scope, receive, send):
+        pass
+
+async def sse_endpoint(request):
     auth_header = request.headers.get("Authorization")
     base_url = str(request.base_url).rstrip('/')
     
@@ -298,33 +301,31 @@ async def sse_endpoint(scope, receive, send):
     else:
         # Normal OAuth flow check
         if not auth_header or not auth_header.startswith("Bearer "):
-            response = JSONResponse(
+            return JSONResponse(
                 {"error": "unauthorized"}, 
                 status_code=401,
                 headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
             )
-            await response(scope, receive, send)
-            return
             
         token = auth_header.split(" ")[1]
         if not is_valid_token(token):
-            response = JSONResponse(
+            return JSONResponse(
                 {"error": "forbidden"}, 
                 status_code=403,
                 headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
             )
-            await response(scope, receive, send)
-            return
             
-    async with sse.connect_sse(scope, receive, send) as streams:
+    async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
         await mcp._lowlevel_server.run(
             streams[0],
             streams[1],
             mcp._lowlevel_server.create_initialization_options(),
         )
+    return EmptyResponse()
 
-async def messages_endpoint(scope, receive, send):
-    await sse.handle_post_message(scope, receive, send)
+async def messages_endpoint(request):
+    await sse.handle_post_message(request.scope, request.receive, request._send)
+    return EmptyResponse()
 
 async def handle_health(request):
     from starlette.responses import JSONResponse
