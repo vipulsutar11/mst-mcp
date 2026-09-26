@@ -134,7 +134,7 @@ def search_documents(query: str) -> dict[str, list[str]]:
 # Create Starlette app for SSE transport
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
-from starlette.responses import RedirectResponse, JSONResponse, FileResponse
+from starlette.responses import RedirectResponse, JSONResponse, FileResponse, Response
 from starlette.staticfiles import StaticFiles
 # pyrefly: ignore [missing-import]
 from mcp.server.sse import SseServerTransport
@@ -340,7 +340,6 @@ async def handle_favicon(request):
 
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import Response
 
 app = Starlette(
     debug=True,
