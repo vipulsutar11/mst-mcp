@@ -355,6 +355,7 @@ app = Starlette(
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
         Route("/token", endpoint=handle_token, methods=["POST"]),
         Route("/sse", endpoint=sse_endpoint, methods=["GET"]),
+        Route("/sse", endpoint=messages_endpoint, methods=["POST"]),
         Route("/sse/messages", endpoint=messages_endpoint, methods=["POST", "OPTIONS"]),
         Route("/messages", endpoint=messages_endpoint, methods=["POST", "OPTIONS"]),
         Mount("/public", app=StaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")), name="public"),
