@@ -285,70 +285,46 @@ async def handle_authorization_server(request):
 
 sse = SseServerTransport("/messages")
 
-async def sse_asgi_app(scope, receive, send):
-    if scope["type"] != "http":
-        return
-        
-    from starlette.requests import Request
-    from starlette.responses import JSONResponse
-    request = Request(scope, receive, send)
+async def sse_endpoint(request):
+    auth_header = request.headers.get("Authorization")
+    base_url = str(request.base_url).rstrip('/')
     
-    if request.method == "GET":
-        auth_header = request.headers.get("Authorization")
-        base_url = str(request.base_url).rstrip('/')
-        
-        # Bypass for Antigravity IDE or testing
-        if auth_header == "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123":
-            pass 
-        else:
-            # Normal OAuth flow check
-            if not auth_header or not auth_header.startswith("Bearer "):
-                response = JSONResponse(
-                    {"error": "unauthorized"}, 
-                    status_code=401,
-                    headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
-                )
-                await response(scope, receive, send)
-                return
-                
-            token = auth_header.split(" ")[1]
-            if not is_valid_token(token):
-                response = JSONResponse(
-                    {"error": "forbidden"}, 
-                    status_code=403,
-                    headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
-                )
-                await response(scope, receive, send)
-                return
-                
-        async with sse.connect_sse(scope, receive, send) as streams:
-            await mcp._lowlevel_server.run(
-                streams[0],
-                streams[1],
-                mcp._lowlevel_server.create_initialization_options(),
-            )
-
-async def messages_asgi_app(scope, receive, send):
-    if scope["type"] != "http":
-        return
-    from starlette.requests import Request
-    request = Request(scope, receive, send)
-    if request.method in ["POST", "OPTIONS"]:
-        print(f"DEBUG: messages_asgi_app handling {request.method} request")
-        print(f"DEBUG: original scope path: {scope['path']}")
-        scope["path"] = "/messages"
-        print(f"DEBUG: modified scope path: {scope['path']}")
-        try:
-            await sse.handle_post_message(scope, receive, send)
-            print("DEBUG: handle_post_message finished successfully")
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            from starlette.responses import JSONResponse
-            response = JSONResponse({"error": str(e), "traceback": traceback.format_exc()}, status_code=500)
-            await response(scope, receive, send)
+    # Bypass for Antigravity IDE or testing
+    if auth_header == "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123":
+        pass 
     else:
-        print(f"DEBUG: Method {request.method} not supported in messages_asgi_app")
+        # Normal OAuth flow check
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return JSONResponse(
+                {"error": "unauthorized"}, 
+                status_code=401,
+                headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
+            )
+            
+        token = auth_header.split(" ")[1]
+        if not is_valid_token(token):
+            return JSONResponse(
+                {"error": "forbidden"}, 
+                status_code=403,
+                headers={"WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'}
+            )
+            
+    async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
+        await mcp._lowlevel_server.run(
+            streams[0],
+            streams[1],
+            mcp._lowlevel_server.create_initialization_options(),
+        )
+    return Response()
+
+async def messages_endpoint(request):
+    try:
+        await sse.handle_post_message(request.scope, request.receive, request._send)
+    except Exception as e:
+        import traceback
+        return JSONResponse({"error": str(e), "traceback": traceback.format_exc()}, status_code=500)
+    # Return empty response in case handle_post_message doesn't send one (though it should)
+    return Response(status_code=202)
 
 async def handle_health(request):
     from starlette.responses import JSONResponse
@@ -363,6 +339,7 @@ async def handle_favicon(request):
 
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import Response
 
 app = Starlette(
     debug=True,
@@ -377,9 +354,9 @@ app = Starlette(
         Route("/.well-known/oauth-authorization-server", endpoint=handle_authorization_server, methods=["GET"]),
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
         Route("/token", endpoint=handle_token, methods=["POST"]),
-        Mount("/sse/messages", app=messages_asgi_app),
-        Mount("/sse", app=sse_asgi_app),
-        Mount("/messages", app=messages_asgi_app),
+        Route("/sse", endpoint=sse_endpoint, methods=["GET"]),
+        Route("/sse/messages", endpoint=messages_endpoint, methods=["POST", "OPTIONS"]),
+        Route("/messages", endpoint=messages_endpoint, methods=["POST", "OPTIONS"]),
         Mount("/public", app=StaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")), name="public"),
     ],
 )
