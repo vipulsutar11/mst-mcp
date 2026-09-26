@@ -283,7 +283,7 @@ async def handle_authorization_server(request):
         "code_challenge_methods_supported": ["S256"]
     })
 
-sse = SseServerTransport("/sse")
+sse = SseServerTransport("/messages")
 
 async def sse_asgi_app(scope, receive, send):
     if scope["type"] != "http":
@@ -327,11 +327,16 @@ async def sse_asgi_app(scope, receive, send):
                 streams[1],
                 mcp._lowlevel_server.create_initialization_options(),
             )
-            
-    elif request.method in ["POST", "OPTIONS"]:
-        # Let the SDK handle the POST message entirely (including session checks)
-        # We restore the path because Mount strips it, and SDK might log it
-        scope["path"] = "/sse"
+
+async def messages_asgi_app(scope, receive, send):
+    if scope["type"] != "http":
+        return
+    from starlette.requests import Request
+    request = Request(scope, receive, send)
+    if request.method in ["POST", "OPTIONS"]:
+        # The MCP SDK handle_post_message checks if scope["path"] matches the transport endpoint.
+        # Since this is mounted or routed directly, we ensure scope["path"] is "/messages"
+        scope["path"] = "/messages"
         await sse.handle_post_message(scope, receive, send)
 
 async def handle_health(request):
@@ -362,6 +367,7 @@ app = Starlette(
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
         Route("/token", endpoint=handle_token, methods=["POST"]),
         Mount("/sse", app=sse_asgi_app),
+        Route("/messages", endpoint=messages_asgi_app, methods=["POST", "OPTIONS"]),
         Mount("/public", app=StaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")), name="public"),
     ],
 )
