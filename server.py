@@ -200,6 +200,89 @@ def is_valid_token(token: str) -> bool:
     conn.close()
     return exists
 
+sse = SseServerTransport("/messages/")
+
+async def handle_authorize(request):
+    params = request.query_params
+    client_id = params.get("client_id")
+    redirect_uri = params.get("redirect_uri")
+    state = params.get("state")
+    
+    # Strictly validate against the environment variable CLIENT_ID (loaded from .env / Render env)
+    if client_id != CLIENT_ID:
+        return JSONResponse({"error": "invalid_client"}, status_code=400)
+    
+    # Generate a temporary authorization code
+    code = "auth_code_" + os.urandom(8).hex()
+    add_auth_code(code)
+    
+    # Redirect back to Claude with the code and state
+    callback_url = f"{redirect_uri}?code={code}"
+    if state:
+        callback_url += f"&state={state}"
+        
+    return RedirectResponse(url=callback_url)
+
+async def handle_token(request):
+    # Try parsing client credentials from Basic Auth header first
+    auth_header = request.headers.get("Authorization")
+    client_id = None
+    client_secret = None
+    if auth_header and auth_header.startswith("Basic "):
+        import base64
+        try:
+            decoded = base64.b64decode(auth_header.split(" ")[1]).decode("utf-8")
+            client_id, client_secret = decoded.split(":", 1)
+        except Exception:
+            pass
+
+    form_data = await request.form()
+    if not client_id:
+        client_id = form_data.get("client_id")
+    if not client_secret:
+        client_secret = form_data.get("client_secret")
+    code = form_data.get("code")
+    
+    # Strictly validate against environmental CLIENT_ID and CLIENT_SECRET
+    if client_id != CLIENT_ID or client_secret != CLIENT_SECRET or not verify_and_remove_auth_code(code):
+        return JSONResponse({"error": "invalid_grant"}, status_code=400)
+    
+    # Issue access token
+    token = "token_" + os.urandom(16).hex()
+    add_access_token(token)
+    
+    return JSONResponse({
+        "access_token": token,
+        "token_type": "Bearer"
+    })
+
+async def handle_protected_resource(request):
+    base_url = str(request.base_url).rstrip('/')
+    return JSONResponse({
+        "resource": base_url,
+        "authorization_servers": [
+            base_url
+        ],
+        "scopes_supported": [
+            "mcp"
+        ],
+        "bearer_methods_supported": [
+            "header"
+        ]
+    })
+
+async def handle_authorization_server(request):
+    base_url = str(request.base_url).rstrip('/')
+    return JSONResponse({
+        "issuer": base_url,
+        "authorization_endpoint": f"{base_url}/authorize",
+        "token_endpoint": f"{base_url}/token",
+        "scopes_supported": ["mcp"],
+        "response_types_supported": ["code"],
+        "grant_types_supported": ["authorization_code"],
+        "code_challenge_methods_supported": ["S256"]
+    })
+
 sse = SseServerTransport("/sse")
 
 async def sse_asgi_app(scope, receive, send):
