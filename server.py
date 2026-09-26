@@ -284,27 +284,32 @@ async def handle_authorization_server(request):
     })
 
 async def handle_sse(request):
-    # Verify access token bypassed for testing direct Claude connection
-    # auth_header = request.headers.get("Authorization")
-    # base_url = str(request.base_url).rstrip('/')
-    # if not auth_header or not auth_header.startswith("Bearer "):
-    #     return JSONResponse(
-    #         {"error": "unauthorized"}, 
-    #         status_code=401,
-    #         headers={
-    #             "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
-    #         }
-    #     )
-    #     
-    # token = auth_header.split(" ")[1]
-    # if not is_valid_token(token):
-    #     return JSONResponse(
-    #         {"error": "forbidden"}, 
-    #         status_code=403,
-    #         headers={
-    #             "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
-    #         }
-    #     )
+    auth_header = request.headers.get("Authorization")
+    base_url = str(request.base_url).rstrip('/')
+    
+    # Bypass for Antigravity IDE or testing
+    if auth_header == "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123":
+        pass 
+    else:
+        # Normal OAuth flow check
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return JSONResponse(
+                {"error": "unauthorized"}, 
+                status_code=401,
+                headers={
+                    "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
+                }
+            )
+            
+        token = auth_header.split(" ")[1]
+        if not is_valid_token(token):
+            return JSONResponse(
+                {"error": "forbidden"}, 
+                status_code=403,
+                headers={
+                    "WWW-Authenticate": f'Bearer resource_metadata="{base_url}/.well-known/oauth-protected-resource"'
+                }
+            )
 
 
     if request.method == "POST":
@@ -344,7 +349,7 @@ app = Starlette(
         Route("/token", endpoint=handle_token, methods=["POST"]),
         Route("/sse", endpoint=handle_sse, methods=["GET", "POST"]),
         Mount("/messages/", app=sse.handle_post_message),
-        Mount("/public", app=StaticFiles(directory="public"), name="public"),
+        Mount("/public", app=StaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")), name="public"),
     ],
 )
 
