@@ -334,10 +334,21 @@ async def messages_asgi_app(scope, receive, send):
     from starlette.requests import Request
     request = Request(scope, receive, send)
     if request.method in ["POST", "OPTIONS"]:
-        # The MCP SDK handle_post_message checks if scope["path"] matches the transport endpoint.
-        # Since this is mounted or routed directly, we ensure scope["path"] is "/messages"
+        print(f"DEBUG: messages_asgi_app handling {request.method} request")
+        print(f"DEBUG: original scope path: {scope['path']}")
         scope["path"] = "/messages"
-        await sse.handle_post_message(scope, receive, send)
+        print(f"DEBUG: modified scope path: {scope['path']}")
+        try:
+            await sse.handle_post_message(scope, receive, send)
+            print("DEBUG: handle_post_message finished successfully")
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            from starlette.responses import JSONResponse
+            response = JSONResponse({"error": str(e), "traceback": traceback.format_exc()}, status_code=500)
+            await response(scope, receive, send)
+    else:
+        print(f"DEBUG: Method {request.method} not supported in messages_asgi_app")
 
 async def handle_health(request):
     from starlette.responses import JSONResponse
@@ -366,8 +377,9 @@ app = Starlette(
         Route("/.well-known/oauth-authorization-server", endpoint=handle_authorization_server, methods=["GET"]),
         Route("/authorize", endpoint=handle_authorize, methods=["GET"]),
         Route("/token", endpoint=handle_token, methods=["POST"]),
+        Mount("/sse/messages", app=messages_asgi_app),
         Mount("/sse", app=sse_asgi_app),
-        Route("/messages", endpoint=messages_asgi_app, methods=["POST", "OPTIONS"]),
+        Mount("/messages", app=messages_asgi_app),
         Mount("/public", app=StaticFiles(directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")), name="public"),
     ],
 )

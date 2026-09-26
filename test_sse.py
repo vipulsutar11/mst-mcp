@@ -2,7 +2,7 @@ import urllib.request
 import json
 
 # First, GET the SSE endpoint to get the messages URL
-req = urllib.request.Request("https://mst-mcp-xjb5.onrender.com/sse", method="GET", headers={"Authorization": "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123"})
+req = urllib.request.Request("http://localhost:8005/sse", method="GET", headers={"Authorization": "Bearer ANTIGRAVITY_IDE_BYPASS_TOKEN_123"})
 try:
     with urllib.request.urlopen(req) as response:
         # Read the first event
@@ -20,7 +20,7 @@ try:
         
         # Now try to POST a dummy initialize message to it
         if endpoint_url.startswith("/"):
-            endpoint_url = "https://mst-mcp-xjb5.onrender.com" + endpoint_url
+            endpoint_url = "http://localhost:8005" + endpoint_url
             
         print("Full POST url:", endpoint_url)
         
