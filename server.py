@@ -137,7 +137,7 @@ from starlette.routing import Route, Mount
 from starlette.responses import RedirectResponse, JSONResponse, FileResponse, Response
 from starlette.staticfiles import StaticFiles
 # pyrefly: ignore [missing-import]
-from mcp.server.sse import SseServerTransport
+from mcp.server.sse import SseServerTransport, TransportSecuritySettings
 
 # Configuration for OAuth (Use environment variables or secure defaults)
 CLIENT_ID = os.environ.get("OAUTH_CLIENT_ID", "mst-mcp-client")
@@ -199,8 +199,6 @@ def is_valid_token(token: str) -> bool:
     exists = cursor.fetchone() is not None
     conn.close()
     return exists
-
-sse = SseServerTransport("/messages/")
 
 async def handle_authorize(request):
     params = request.query_params
@@ -283,7 +281,10 @@ async def handle_authorization_server(request):
         "code_challenge_methods_supported": ["S256"]
     })
 
-sse = SseServerTransport("/messages")
+sse = SseServerTransport(
+    "/messages",
+    security_settings=TransportSecuritySettings(enable_dns_rebinding_protection=False)
+)
 
 from starlette.requests import Request
 
