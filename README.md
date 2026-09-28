@@ -3,8 +3,31 @@
 An official Model Context Protocol (MCP) server for the **MST Chain** ecosystem. This server provides tools for LLMs (like Claude) to search, list, and retrieve MST developer documentation (APIs, wallets, transactions, authentication, etc.).
 
 ## 🚀 Deployed Endpoint
-* **Base URL (SSE Transport):** `http://<YOUR_AWS_EC2_IP_OR_DOMAIN>:<PORT>/sse`
-* **Favicon / Branding:** `http://<YOUR_AWS_EC2_IP_OR_DOMAIN>:<PORT>/favicon.png`
+* **Base URL (SSE Transport):** `https://mst-mcp-xjb5.onrender.com/sse`
+* **Favicon / Branding:** `https://mst-mcp-xjb5.onrender.com/favicon.png`
+
+### 💻 How Developers Can Connect (Claude Desktop, Cursor, Antigravity IDE)
+
+Because IDEs require a standard STDIO connection but the server is hosted remotely, developers must use the provided `sse_bridge.py` script to tunnel the connection.
+
+1. Developers clone this repository:
+   ```bash
+   git clone https://github.com/vipulsutar11/mst-mcp.git
+   cd mst-mcp
+   pip install aiohttp
+   ```
+2. They configure their IDE (e.g. `mcp_config.json` or `claude_desktop_config.json`) to use the bridge script:
+   ```json
+   {
+     "mcpServers": {
+       "mst-mcp": {
+         "command": "python",
+         "args": ["/path/to/cloned/mst-mcp/sse_bridge.py"]
+       }
+     }
+   }
+   ```
+   *Note: This script automatically handles the Bypass Token and SSE connections.*
 
 ---
 
